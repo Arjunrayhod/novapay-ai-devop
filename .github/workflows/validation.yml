@@ -81,7 +81,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Setup actionlint
         run: |
-          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash) 1.7.12
           echo "$PWD" >> "$GITHUB_PATH"
       - name: Lint GitHub Actions workflows
         run: actionlint -color
