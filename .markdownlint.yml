@@ -17,11 +17,11 @@ MD024:
 
 # Multiple top-level headings — allow in some docs
 MD025:
-  front_matter_title: ""
+  front_matter_title: ''
 
 # Trailing punctuation in heading — relaxed
 MD026:
-  punctuation: ".,;:!。，；：！"
+  punctuation: '.,;:!。，；：！'
 
 # Inline HTML — allow (mermaid, etc.)
 MD033: false
@@ -40,7 +40,7 @@ MD041: false
 
 # Code block indentation — relaxed
 MD046:
-  style: "fenced"
+  style: 'fenced'
 
 # File should end with newline — handled by .editorconfig
 MD047: false

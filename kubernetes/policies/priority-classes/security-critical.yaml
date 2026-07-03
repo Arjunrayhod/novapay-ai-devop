@@ -7,6 +7,6 @@ metadata:
 value: 9000
 globalDefault: false
 description: >
-  'For security components — OPA/Gatekeeper, Falco, auth proxies.
+  For security components — OPA/Gatekeeper, Falco, auth proxies.
   Preempted only by platform-critical. Ensures security posture
-  during resource contention.'
+  during resource contention.

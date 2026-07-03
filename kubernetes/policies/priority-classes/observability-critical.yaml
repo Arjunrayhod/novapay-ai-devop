@@ -7,5 +7,5 @@ metadata:
 value: 8000
 globalDefault: false
 description: >
-  'For observability stack — Prometheus, Grafana, Loki, Alertmanager.
-  Ensures monitoring continuity during resource contention.'
+  For observability stack — Prometheus, Grafana, Loki, Alertmanager.
+  Ensures monitoring continuity during resource contention.

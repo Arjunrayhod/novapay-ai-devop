@@ -7,6 +7,6 @@ metadata:
 value: 0
 globalDefault: true
 description: >
-  'Default priority for standard application workloads. Matches the
+  Default priority for standard application workloads. Matches the
   Kubernetes default priority. Preempted by platform, security,
-  observability, and application-high workloads.'
+  observability, and application-high workloads.
