@@ -165,7 +165,7 @@ jobs:
 
       - name: Attest build provenance
         if: needs.version.outputs.dry_run != 'true'
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v4
         with:
           subject-path: /tmp/image/image.tar
 
