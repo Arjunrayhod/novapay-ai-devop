@@ -202,11 +202,12 @@ jobs:
       - name: Build Docker image for SBOM
         run: docker build -t ${{ env.IMAGE_NAME }}:sbom -f Dockerfile .
       - name: Generate ${{ matrix.format }} SBOM
-        uses: anchore/syft@v0.107.0
+        uses: anchore/sbom-action@v0
         with:
-          source: ${{ env.IMAGE_NAME }}:sbom
+          image: ${{ env.IMAGE_NAME }}:sbom
           format: ${{ matrix.syft-format }}
-          output: ${{ matrix.filename }}
+          output-file: ${{ matrix.filename }}
+          upload-artifact: false
       - name: Upload ${{ matrix.format }} SBOM artifact
         uses: actions/upload-artifact@v4
         with:

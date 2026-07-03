@@ -75,18 +75,20 @@ jobs:
           outputs: type=docker,dest=/tmp/image.tar
 
       - name: Generate CycloneDX SBOM
-        uses: anchore/syft@v0.107.0
+        uses: anchore/sbom-action@v0
         with:
-          source: docker-archive:/tmp/image.tar
+          image: docker-archive:/tmp/image.tar
           format: cyclonedx-json
-          output: sbom-cdx.json
+          output-file: sbom-cdx.json
+          upload-artifact: false
 
       - name: Generate SPDX SBOM
-        uses: anchore/syft@v0.107.0
+        uses: anchore/sbom-action@v0
         with:
-          source: docker-archive:/tmp/image.tar
+          image: docker-archive:/tmp/image.tar
           format: spdx-json
-          output: sbom-spdx.json
+          output-file: sbom-spdx.json
+          upload-artifact: false
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
