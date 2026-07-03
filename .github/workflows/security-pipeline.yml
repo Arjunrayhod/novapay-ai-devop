@@ -162,7 +162,7 @@ jobs:
         run: |
           checkov \
             --directory . \
-            --framework terraform,kubernetes,docker \
+            --framework terraform kubernetes dockerfile \
             --output sarif \
             --output-file-path checkov.sarif \
             --compact \
