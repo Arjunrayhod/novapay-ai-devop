@@ -36,7 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate repository structure
         run: |
           errors=0
@@ -62,7 +62,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -78,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup actionlint
         run: |
           url="https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash"
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Validate JSON files
         run: |
           errors=0
@@ -116,7 +116,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -131,7 +131,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -146,7 +146,7 @@ jobs:
     timeout-minutes: 10
     needs: [terraform-fmt]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -163,7 +163,7 @@ jobs:
     timeout-minutes: 5
     needs: [yaml-validation]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup kubectl
         run: |
           curl -sLO 'https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl'
@@ -197,7 +197,7 @@ jobs:
         chart: [aegisai-common, metrics-server]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Helm
         uses: azure/setup-helm@v4
         with:
@@ -215,7 +215,7 @@ jobs:
         chart: [aegisai-common, metrics-server]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Helm
         uses: azure/setup-helm@v4
         with:

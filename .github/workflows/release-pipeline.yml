@@ -40,7 +40,7 @@ jobs:
       is_stable: ${{ steps.parse.outputs.is_stable }}
       dry_run: ${{ steps.dry-run.outputs.dry_run }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Resolve tag
         id: resolve
@@ -103,7 +103,7 @@ jobs:
       digest: ${{ steps.push.outputs.digest }}
       image_ref: ${{ steps.push.outputs.image_ref }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download image artifact
         uses: actions/download-artifact@v4
@@ -181,7 +181,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -208,7 +208,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -294,7 +294,7 @@ jobs:
       id-token: write
     if: needs.version.outputs.dry_run != 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download SBOM artifacts
         uses: actions/download-artifact@v4
@@ -325,7 +325,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Download release notes
         uses: actions/download-artifact@v4
