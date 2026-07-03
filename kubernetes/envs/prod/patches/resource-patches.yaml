@@ -1,0 +1,28 @@
+# Production resource patches — high availability and resource allocation.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patch-prod-resources
+  annotations:
+    aegisai.io/patch: prod-resources
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: "*"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1
+              memory: 2Gi
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule

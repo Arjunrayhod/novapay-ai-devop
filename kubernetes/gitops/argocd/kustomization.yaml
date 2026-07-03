@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  annotations:
+    aegisai.io/component: argocd
+  name: argocd-install
+
+resources:
+- https://github.com/argoproj/argo-cd.git//manifests/cluster-install?ref=v2.12.0
+
+patches:
+- path: argocd-cm.yaml
+- path: argocd-rbac-cm.yaml

@@ -1,0 +1,109 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-backup-restore
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gitops-backup-restore
+    aegisai.io/component: documentation
+    aegisai.io/doc-type: backup-restore
+data:
+  title: "ArgoCD Backup & Restore Procedures"
+  version: "1.0.0"
+  backup-strategy: |
+    Principle: Git is the source of truth. ArgoCD is stateless and can be rebuilt from Git.
+    Backup Scope: ArgoCD configuration (not Application state)
+
+    WHAT to backup:
+      - Git repository (all manifests)
+      - ArgoCD ConfigMaps: argocd-cm, argocd-rbac-cm, argocd-notifications-cm
+      - ArgoCD Secrets: argocd-secret (admin password, signing key), argocd-notifications-secret
+      - Cluster credentials (stored in Secrets with label argocd.argoproj.io/secret-type: cluster)
+      - ArgoCD Project and Application CRDs (recoverable from Git)
+
+    WHAT NOT to backup:
+      - Live application state (recoverable from Git)
+      - Kubernetes Secrets managed by External Secrets Operator (recoverable from vault)
+      - Runtime metrics and monitoring data
+
+  automated-backup: |
+    SCHEDULE: Daily at 02:00 UTC via Kubernetes CronJob
+
+    Backup Script (argocd-backup.sh):
+      #!/bin/bash
+      BACKUP_DIR="/backup/argocd/$(date +%Y-%m-%d)"
+      mkdir -p "$BACKUP_DIR"
+
+      # Backup ConfigMaps
+      kubectl get configmap -n argocd argocd-cm -o yaml > "$BACKUP_DIR/argocd-cm.yaml"
+      kubectl get configmap -n argocd argocd-rbac-cm -o yaml > "$BACKUP_DIR/argocd-rbac-cm.yaml"
+      kubectl get configmap -n argocd argocd-notifications-cm -o yaml > "$BACKUP_DIR/argocd-notifications-cm.yaml"
+      kubectl get configmap -n argocd argocd-ssh-known-hosts-cm -o yaml > "$BACKUP_DIR/argocd-ssh-known-hosts-cm.yaml" 2>/dev/null || true
+
+      # Backup Secrets (re-encrypted)
+      kubectl get secret -n argocd argocd-secret -o yaml > "$BACKUP_DIR/argocd-secret.yaml"
+      kubectl get secret -n argocd argocd-notifications-secret -o yaml > "$BACKUP_DIR/argocd-notifications-secret.yaml"
+
+      # Backup cluster secrets
+      kubectl get secret -n argocd -l argocd.argoproj.io/secret-type=cluster -o yaml > "$BACKUP_DIR/cluster-secrets.yaml"
+
+      # Encrypt sensitive backups
+      gpg --encrypt --recipient backup-team "$BACKUP_DIR/argocd-secret.yaml"
+      gpg --encrypt --recipient backup-team "$BACKUP_DIR/argocd-notifications-secret.yaml"
+      gpg --encrypt --recipient backup-team "$BACKUP_DIR/cluster-secrets.yaml"
+      rm -f "$BACKUP_DIR/argocd-secret.yaml" "$BACKUP_DIR/argocd-notifications-secret.yaml" "$BACKUP_DIR/cluster-secrets.yaml"
+
+      # Upload to secure storage
+      aws s3 sync "$BACKUP_DIR" s3://novapay-argocd-backups/$(date +%Y-%m-%d)/
+
+      # Retention: keep daily for 30 days, keep monthly for 12 months
+
+    CronJob Definition:
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: argocd-backup
+        namespace: argocd
+      spec:
+        schedule: "0 2 * * *"
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                serviceAccountName: argocd-backup-sa
+                containers:
+                  - name: backup
+                    image: bitnami/kubectl:1.30
+                    command: ["/bin/sh", "/scripts/argocd-backup.sh"]
+
+  restore-procedure: |
+    PREREQUISITES:
+      - Access to S3 bucket: s3://novapay-argocd-backups/
+      - GPG key for backup decryption
+    RESTORE STEPS:
+        STEP 1: Download latest backup
+          aws s3 sync s3://novapay-argocd-backups/latest/ ./restore/
+        STEP 2: Decrypt secrets (if restoring from backup)
+          gpg --decrypt ./restore/argocd-secret.yaml.gpg > ./restore/argocd-secret.yaml
+          gpg --decrypt ./restore/argocd-notifications-secret.yaml.gpg > ./restore/argocd-notifications-secret.yaml
+        STEP 3: Restore ArgoCD configuration
+          kubectl apply -f ./restore/argocd-cm.yaml
+          kubectl apply -f ./restore/argocd-rbac-cm.yaml
+          kubectl apply -f ./restore/argocd-secret.yaml
+          kubectl apply -f ./restore/argocd-notifications-cm.yaml
+        STEP 4: Restore cluster credentials
+          kubectl apply -f ./restore/cluster-secrets.yaml
+        STEP 5: Verify restoration
+          kubectl rollout restart -n argocd deployment/argocd-server
+          kubectl rollout restart -n argocd deployment/argocd-repo-server
+          kubectl rollout restart -n argocd deployment/argocd-application-controller
+        STEP 6: Force resync
+          argocd app list -o name | xargs -I{} argocd app sync {} --force
+
+  backup-retention: |
+    Daily backups: 30 days retention
+    Weekly backups: 12 weeks retention
+    Monthly backups: 12 months retention
+    Yearly backups: 7 years retention (compliance)
+    Storage: AWS S3 with cross-region replication
+    Encryption: AES-256 at rest, GPG for secrets in backup

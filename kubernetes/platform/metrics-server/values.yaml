@@ -1,0 +1,12 @@
+# metrics-server Helm values for AegisAI platform.
+
+apiService:
+  create: true
+
+hostNetwork:
+  enabled: false
+
+replicas: 2
+
+metrics:
+  enabled: true

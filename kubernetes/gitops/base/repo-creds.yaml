@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: novapay-gitops-token
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: novapay-gitops-token
+    app.kubernetes.io/part-of: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-2'
+type: Opaque
+stringData:
+  type: git
+  url: https://github.com/novapay/novapay-ai-devops
+  password: ''

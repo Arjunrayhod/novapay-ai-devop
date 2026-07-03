@@ -1,0 +1,325 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prometheus-self
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: prometheus-self
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: prometheus
+  endpoints:
+    - port: web
+      interval: 15s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: grafana
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: grafana
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grafana
+  endpoints:
+    - port: http
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: loki
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: loki
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: loki
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: tempo
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: tempo
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tempo
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: otel-collector
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: otel-collector
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kubelet
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kubelet
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kubelet
+  endpoints:
+    - port: https-metrics
+      scheme: https
+      interval: 30s
+      path: /metrics
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+    - port: https-metrics
+      scheme: https
+      interval: 30s
+      path: /metrics/cadvisor
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-controllers
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-controllers
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kube-controllers
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-scheduler
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-scheduler
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kube-scheduler
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-etcd
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-etcd
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: etcd
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-apiserver
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-apiserver
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: apiserver
+  endpoints:
+    - port: https-metrics
+      scheme: https
+      interval: 30s
+      path: /metrics
+      tlsConfig:
+        caFile: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecureSkipVerify: true
+      bearerTokenFile: /var/run/secrets/kubernetes.io/serviceaccount/token
+  namespaceSelector:
+    matchNames:
+      - default
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-proxy
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-proxy
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: kube-proxy
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: coredns
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: coredns
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-dns
+  endpoints:
+    - port: metrics
+      interval: 30s
+      path: /metrics
+  namespaceSelector:
+    matchNames:
+      - kube-system
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: kube-state-metrics
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: kube-state-metrics
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  endpoints:
+    - port: http
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: node-exporter
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: node-exporter
+  endpoints:
+    - port: http
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ingress-nginx
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: ingress-nginx
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ingress-nginx
+  endpoints:
+    - port: metrics
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: cert-manager
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: cert-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cert-manager
+  endpoints:
+    - port: http-metrics
+      interval: 30s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: metrics-server
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/scrape: prometheus
+    app.kubernetes.io/name: metrics-server
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: metrics-server
+  endpoints:
+    - port: https
+      scheme: https
+      interval: 30s
+      tlsConfig:
+        insecureSkipVerify: true

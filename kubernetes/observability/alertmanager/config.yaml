@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-templates
+  namespace: aegisai-observability
+  labels:
+    app.kubernetes.io/name: alertmanager
+data:
+  slack.tmpl: |
+    {{ define "slack.title" }}{{ .GroupLabels.alertname }}{{ end }}
+    {{ define "slack.text" }}
+    {{ range .Alerts }}
+    *Alert:* {{ .Labels.alertname }}
+    *Severity:* {{ .Labels.severity }}
+    *Namespace:* {{ .Labels.namespace }}
+    *Description:* {{ .Annotations.description }}
+    *Summary:* {{ .Annotations.summary }}
+    *Started:* {{ .StartsAt }}
+    {{ end }}
+    {{ end }}

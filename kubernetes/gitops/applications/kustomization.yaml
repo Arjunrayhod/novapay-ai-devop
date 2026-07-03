@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  annotations:
+    aegisai.io/component: argocd-applications
+  name: argocd-applications
+
+resources:
+- applications.yaml
+- metrics-server.yaml
+- ingress-nginx.yaml
+- cert-manager.yaml
+- external-dns.yaml
+- external-secrets.yaml
+- environments/dev.yaml
+- environments/staging.yaml
+- environments/prod.yaml
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/part-of: argocd

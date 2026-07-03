@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-platform
+  annotations:
+    aegisai.io/component: platform
+    aegisai.io/managed-by: terraform
+
+# Base components loaded by environment overlays
+# Do NOT apply this root kustomization directly.
+# Use envs/{dev,staging,prod}/kustomization.yaml instead.
+resources:
+  - base
+
+commonLabels:
+  aegisai.io/managed-by: terraform
+  aegisai.io/platform: aegisai

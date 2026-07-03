@@ -1,0 +1,6 @@
+dependencies:
+- name: aegisai-common
+  repository: file://../aegisai-common
+  version: 0.1.0
+digest: sha256:179ed954823d372a42387efaa710957d07acca7bc6e46409ede7c65659720cc7
+generated: "2026-07-03T11:00:22.9651575+05:30"

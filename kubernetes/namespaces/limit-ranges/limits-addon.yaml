@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: aegisai-limits-addon
+  annotations:
+    aegisai.io/limit-tier: addon
+spec:
+  limits:
+    - max:
+        cpu: "2"
+        memory: 4Gi
+      min:
+        cpu: 10m
+        memory: 32Mi
+      default:
+        cpu: 100m
+        memory: 128Mi
+      defaultRequest:
+        cpu: 25m
+        memory: 64Mi
+      type: Container

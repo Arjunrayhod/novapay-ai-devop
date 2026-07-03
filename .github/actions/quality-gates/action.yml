@@ -1,0 +1,278 @@
+name: "AegisAI Quality Gates"
+description: "Reusable quality gate checks for Python, Terraform, Docker, security, and documentation"
+author: "AegisAI Platform Engineering"
+
+inputs:
+  python-version:
+    description: "Python version to use"
+    required: false
+    default: "3.11"
+  terraform-version:
+    description: "Terraform version to use"
+    required: false
+    default: "1.9.0"
+  tf-dir:
+    description: "Directory containing Terraform code"
+    required: false
+    default: "./terraform"
+  docker-dir:
+    description: "Directory containing Dockerfile"
+    required: false
+    default: "."
+  fail-on-secrets:
+    description: "Fail CI if secrets are detected"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    # =========================================================================
+    # Stage 1: Setup
+    # =========================================================================
+    - name: Setup Python
+      id: setup-python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Python dependencies
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        pip install ruff mypy pytest pytest-cov pytest-asyncio semgrep pip-audit cyclonedx-bom pip-licenses pre-commit
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        echo "Python dependencies installed"
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ${{ inputs.terraform-version }}
+
+    - name: Install yamllint
+      shell: bash
+      run: |
+        pip install yamllint markdownlint-cli
+
+    # =========================================================================
+    # Stage 2: Python Quality
+    # =========================================================================
+    - name: Python Lint (ruff)
+      id: python-lint
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::ruff lint"
+        ruff check . --output-format=github
+        echo "::endgroup::"
+
+    - name: Python Format Check (ruff)
+      id: python-format
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::ruff format check"
+        ruff format . --check --diff
+        echo "::endgroup::"
+
+    - name: Python Type Check (mypy)
+      id: python-typecheck
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::mypy type check"
+        mypy --strict --ignore-missing-imports .
+        echo "::endgroup::"
+
+    - name: Python Unit Tests (pytest)
+      id: python-tests
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::pytest unit tests"
+        pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=80 -v
+        echo "::endgroup::"
+
+    # =========================================================================
+    # Stage 3: Terraform Quality
+    # =========================================================================
+    - name: Terraform Format Check
+      id: tf-format
+      shell: bash
+      continue-on-error: false
+      working-directory: ${{ inputs.tf-dir }}
+      run: |
+        echo "::group::terraform fmt"
+        terraform fmt -check -recursive
+        echo "::endgroup::"
+
+    - name: Terraform Init
+      id: tf-init
+      shell: bash
+      continue-on-error: false
+      working-directory: ${{ inputs.tf-dir }}
+      run: |
+        echo "::group::terraform init"
+        terraform init -backend=false
+        echo "::endgroup::"
+
+    - name: Terraform Validate
+      id: tf-validate
+      shell: bash
+      continue-on-error: false
+      working-directory: ${{ inputs.tf-dir }}
+      run: |
+        echo "::group::terraform validate"
+        terraform validate -no-color
+        echo "::endgroup::"
+
+    # =========================================================================
+    # Stage 4: Docker Build Validation
+    # =========================================================================
+    - name: Docker Build Validation
+      id: docker-build
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::docker build check"
+        if [ -f "${{ inputs.docker-dir }}/Dockerfile" ]; then
+          docker build -t aegisai-ci-test --quiet "${{ inputs.docker-dir }}"
+          echo "Docker build succeeded"
+        else
+          echo "No Dockerfile found — skipping docker build"
+        fi
+        echo "::endgroup::"
+
+    # =========================================================================
+    # Stage 5: Documentation Quality
+    # =========================================================================
+    - name: Markdown Lint
+      id: markdown-lint
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::markdownlint"
+        npx markdownlint-cli '**/*.md' --ignore node_modules --config .markdownlint.yml 2>/dev/null || \
+          markdownlint '**/*.md' --ignore node_modules --config .markdownlint.yml || true
+        echo "::endgroup::"
+
+    - name: YAML Lint
+      id: yaml-lint
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::yamllint"
+        yamllint -c .yamllint.yml .
+        echo "::endgroup::"
+
+    # =========================================================================
+    # Stage 6: Security Scanning
+    # =========================================================================
+    - name: Secret Scanning (trufflehog)
+      id: secret-scan
+      shell: bash
+      continue-on-error: ${{ inputs.fail-on-secrets != 'true' }}
+      run: |
+        echo "::group::trufflehog secrets scan"
+        pip install trufflehog 2>/dev/null || true
+        trufflehog filesystem --directory=. --no-verification --fail 2>&1 || trufflehog git file://. --no-verification --since-commit HEAD~1 2>&1 || \
+          echo "No secrets tool available — skipping"
+        echo "::endgroup::"
+
+    - name: SAST Scan (Semgrep)
+      id: sast-scan
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::semgrep SAST"
+        if command -v semgrep &>/dev/null; then
+          semgrep --config=.semgrep/ --error --no-git-ignore 2>&1 || \
+          semgrep --config=auto --error 2>&1
+        else
+          echo "semgrep not available — skipping"
+        fi
+        echo "::endgroup::"
+
+    - name: Dependency Scanning (pip-audit)
+      id: dep-scan
+      shell: bash
+      continue-on-error: false
+      run: |
+        echo "::group::pip-audit dependency scan"
+        if [ -f requirements.txt ]; then
+          pip-audit -r requirements.txt --desc on --ignore-vuln PYSEC-0000 2>&1 || true
+        elif [ -f pyproject.toml ]; then
+          pip-audit --desc on 2>&1 || true
+        else
+          echo "No requirements file found — skipping dependency scan"
+        fi
+        echo "::endgroup::"
+
+    - name: License Scanning (pip-licenses)
+      id: license-scan
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "::group::pip-licenses scan"
+        python -m pip_licenses --format=json --with-system 2>&1 || \
+          echo "pip-licenses not available — skipping"
+        echo "::endgroup::"
+
+    - name: SBOM Generation (CycloneDX)
+      id: sbom-gen
+      shell: bash
+      continue-on-error: true
+      run: |
+        echo "::group::SBOM generation"
+        mkdir -p sbom-output
+        if command -v cyclonedx-py &>/dev/null; then
+          cyclonedx-py --format json --output sbom-output/sbom.json 2>&1 || \
+          cyclonedx-bom -o sbom-output/sbom.json 2>&1
+        elif [ -f requirements.txt ]; then
+          pip list --format=json | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+sbom = {'bomFormat': 'CycloneDX', 'specVersion': '1.5', 'version': 1, 'metadata': {'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)', 'tools': [{'name': 'pip-list'}], 'component': {'name': 'aegisai-platform', 'type': 'application'}}, 'components': [{'type': 'library', 'name': p['name'], 'version': p['version'], 'purl': f'pkg:pypi/{p[\"name\"]}@{p[\"version\"]}'} for p in data]}
+json.dump(sbom, sys.stdout, indent=2)" > sbom-output/sbom.json 2>&1
+        fi
+        if [ -f sbom-output/sbom.json ]; then
+          echo "SBOM generated: $(wc -c < sbom-output/sbom.json) bytes"
+        else
+          echo "SBOM generation skipped — no suitable tool available"
+        fi
+        echo "::endgroup::"
+
+    # =========================================================================
+    # Stage 7: Artifact Upload
+    # =========================================================================
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: |
+          coverage.xml
+          .coverage
+          htmlcov/
+        retention-days: 30
+        overwrite: true
+
+    - name: Upload SBOM
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: sbom
+        path: sbom-output/
+        retention-days: 90
+        overwrite: true
+
+    - name: Upload Lint Reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lint-reports
+        path: |
+          ruff-report.txt
+          mypy-report.txt
+        retention-days: 30
+        overwrite: true

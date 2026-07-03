@@ -1,0 +1,29 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: observability-critical
+  labels:
+    aegisai.io/component: priority-class
+value: 10000
+globalDefault: false
+description: "Critical priority for observability control plane components (Prometheus Operator, Grafana)"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: observability-high
+  labels:
+    aegisai.io/component: priority-class
+value: 8000
+globalDefault: false
+description: "High priority for observability data plane components (Prometheus, Loki, Tempo)"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: observability-default
+  labels:
+    aegisai.io/component: priority-class
+value: 5000
+globalDefault: false
+description: "Default priority for observability supporting components (Alertmanager, OTel Collector)"

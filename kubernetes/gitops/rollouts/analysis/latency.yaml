@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: latency
+  labels:
+    aegisai.io/component: rollouts-analysis
+spec:
+  args:
+    - name: namespace
+    - name: service
+    - name: prometheus-address
+      value: "http://prometheus-operated.aegisai-observability:9090"
+    - name: threshold-p99
+      value: "500"
+    - name: interval
+      value: "60s"
+    - name: count
+      value: 5
+  metrics:
+    - name: latency-p99
+      count: "{{args.count}}"
+      interval: "{{args.interval}}"
+      successCondition: result < {{args.threshold-p99}}
+      failureLimit: 2
+      provider:
+        prometheus:
+          address: "{{args.prometheus-address}}"
+          query: >
+            histogram_quantile(0.99,
+              sum(rate(http_request_duration_seconds_bucket{namespace="{{args.namespace}}", service="{{args.service}}"}[{{args.interval}}])) by (le)
+            ) * 1000

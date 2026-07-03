@@ -1,0 +1,38 @@
+# AegisAI Platform CODEOWNERS
+# Each line is a file pattern followed by one or more owners.
+# Order matters: the last matching pattern takes precedence.
+
+# Global default — Chief Architect owns everything not otherwise specified
+* @aegisai/architecture
+
+# Platform Infrastructure — Terraform, AWS infrastructure
+/terraform/ @aegisai/platform-infra
+
+# Platform Kubernetes — K8s manifests, Helm, GitOps, Istio, OPA
+/kubernetes/ @aegisai/platform-k8s
+
+# Platform Engineering — Python services, API, CLI, standards
+/scripts/ @aegisai/platform-eng
+
+# DevSecOps — Pipeline security, compliance automation
+/pipelines/ @aegisai/devsecops
+
+# AI Platform — AI services, prompts, models
+/ai/ @aegisai/ai-platform
+
+# Platform Observability — Monitoring, logging, tracing, dashboards
+/monitoring/ @aegisai/observability
+
+# Architecture — ADRs, runbooks, architecture documents
+/docs/ @aegisai/architecture
+
+# Root configuration files
+/.github/ @aegisai/architecture
+/.gitignore @aegisai/architecture
+/.editorconfig @aegisai/architecture
+/.pre-commit-config.yaml @aegisai/architecture
+/LICENSE @aegisai/architecture
+/README.md @aegisai/architecture
+/CONTRIBUTING.md @aegisai/architecture
+/SECURITY.md @aegisai/security
+/CODE_OF_CONDUCT.md @aegisai/architecture

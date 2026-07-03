@@ -1,0 +1,432 @@
+# Namespace-scoped RoleBindings for every AegisAI namespace tier.
+# Each namespace receives RoleBindings that map service accounts and
+# groups to the appropriate ClusterRole (admin, edit, view).
+
+---
+# ── System: Security ──────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-security:admin
+  namespace: aegisai-system-security
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-security:edit
+  namespace: aegisai-system-security
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: ServiceAccount
+    name: aegisai-cicd
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-security:view
+  namespace: aegisai-system-security
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── System: Istio ─────────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-istio:admin
+  namespace: aegisai-system-istio
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-istio:view
+  namespace: aegisai-system-istio
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── System: Observability ─────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-observability:admin
+  namespace: aegisai-system-observability
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-observability:edit
+  namespace: aegisai-system-observability
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:system-observability:view
+  namespace: aegisai-system-observability
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── Team: NovaPay ─────────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-novapay:admin
+  namespace: aegisai-team-novapay
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-novapay:edit
+  namespace: aegisai-team-novapay
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: ServiceAccount
+    name: aegisai-cicd
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-novapay:view
+  namespace: aegisai-team-novapay
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── Team: PaySecure ───────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-paysecure:admin
+  namespace: aegisai-team-paysecure
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-paysecure:edit
+  namespace: aegisai-team-paysecure
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: ServiceAccount
+    name: aegisai-cicd
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-paysecure:view
+  namespace: aegisai-team-paysecure
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── Team: LendFlow ────────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-lendflow:admin
+  namespace: aegisai-team-lendflow
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-lendflow:edit
+  namespace: aegisai-team-lendflow
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: ServiceAccount
+    name: aegisai-cicd
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-lendflow:view
+  namespace: aegisai-team-lendflow
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io
+
+---
+# ── Team: FinServ ─────────────────────────────────────────────────────
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-finserv:admin
+  namespace: aegisai-team-finserv
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:admin
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-admin
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-admins
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-finserv:edit
+  namespace: aegisai-team-finserv
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: edit
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:edit
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-platform-operator
+    namespace: aegisai-system-security
+  - kind: ServiceAccount
+    name: aegisai-cicd
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-editors
+    apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: aegisai:binding:team-finserv:view
+  namespace: aegisai-team-finserv
+  labels:
+    aegisai.io/rbac-tier: namespace
+    aegisai.io/rbac-role: view
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: aegisai:namespace:view
+subjects:
+  - kind: ServiceAccount
+    name: aegisai-readonly
+    namespace: aegisai-system-security
+  - kind: Group
+    name: aegisai:namespace-viewers
+    apiGroup: rbac.authorization.k8s.io

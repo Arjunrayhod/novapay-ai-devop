@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: aegisai-limits-platform
+  annotations:
+    aegisai.io/limit-tier: platform
+spec:
+  limits:
+    - max:
+        cpu: "8"
+        memory: 32Gi
+      min:
+        cpu: 10m
+        memory: 32Mi
+      default:
+        cpu: 500m
+        memory: 512Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 256Mi
+      type: Container

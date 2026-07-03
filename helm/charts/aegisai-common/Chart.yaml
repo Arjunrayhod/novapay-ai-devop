@@ -1,0 +1,35 @@
+apiVersion: v2
+name: aegisai-common
+description: AegisAI enterprise shared Helm chart providing reusable Kubernetes resource templates,
+  standard labels, annotations, and production-hardened defaults for all platform services.
+
+type: application
+
+version: 0.1.0
+appVersion: 0.1.0
+
+kubeVersion: ">= 1.30.0"
+
+keywords:
+  - aegisai
+  - platform
+  - common
+  - reusable
+  - enterprise
+
+home: https://github.com/aegisai/platform
+
+sources:
+  - https://github.com/aegisai/platform
+
+maintainers:
+  - name: Platform Kubernetes Team
+    email: platform-kubernetes@aegisai.io
+
+annotations:
+  aegisai.io/environment: production
+  aegisai.io/cost-center: platform
+  aegisai.io/data-classification: internal
+  aegisai.io/compliance: pci-dss,soc2,rbi
+  aegisai.io/managed-by: helm
+  aegisai.io/platform: aegisai

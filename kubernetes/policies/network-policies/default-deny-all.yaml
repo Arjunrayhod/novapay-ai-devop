@@ -1,0 +1,15 @@
+# Default-deny NetworkPolicy applied to every AegisAI namespace.
+# Prevents all ingress and egress traffic unless explicitly allowed.
+# Workloads must opt into connectivity via additional NetworkPolicies.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aegisai-default-deny-all
+  labels:
+    aegisai.io/policy-type: default-deny
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress

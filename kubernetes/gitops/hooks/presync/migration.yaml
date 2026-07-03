@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: db-migration
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "-5"
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: presync
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migration
+          image: public.ecr.aws/docker/library/alpine:3.19
+          command:
+            - sh
+            - -c
+            - |
+              echo "Running database migrations..."
+              sleep 5
+              echo "Migrations completed successfully"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      serviceAccountName: db-migration-sa
+  backoffLimit: 2
+  ttlSecondsAfterFinished: 300
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: db-migration-sa
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: presync
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: db-migration-role
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: presync
+rules:
+  - apiGroups: [""]
+    resources: ["secrets", "configmaps"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: db-migration-binding
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: presync
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: db-migration-role
+subjects:
+  - kind: ServiceAccount
+    name: db-migration-sa

@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aegisai-allow-intra-tier
+  labels:
+    aegisai.io/policy-type: allow-intra-tier
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchExpressions:
+              - key: aegisai.io/tier
+                operator: In
+                values: [system, platform]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchExpressions:
+              - key: aegisai.io/tier
+                operator: In
+                values: [system, platform]

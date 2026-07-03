@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-system-security
+  labels:
+    aegisai.io/tier: system
+    aegisai.io/component: security
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+    aegisai.io/cost-center: platform
+    aegisai.io/data-classification: restricted
+    aegisai.io/compliance: pci-dss,soc2,rbi
+    app.kubernetes.io/name: aegisai-system-security
+    app.kubernetes.io/component: security
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: platform-engineering
+  annotations:
+    aegisai.io/owner: platform-engineering
+    aegisai.io/contact: platform@aegisai.io
+    aegisai.io/purpose: System security controllers and service accounts
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-system-istio
+  labels:
+    aegisai.io/tier: system
+    aegisai.io/component: istio
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+    aegisai.io/cost-center: platform
+    aegisai.io/data-classification: restricted
+    aegisai.io/compliance: pci-dss,soc2,rbi
+    app.kubernetes.io/name: aegisai-system-istio
+    app.kubernetes.io/component: service-mesh
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: platform-engineering
+  annotations:
+    aegisai.io/owner: platform-engineering
+    aegisai.io/contact: platform@aegisai.io
+    aegisai.io/purpose: Istio service mesh control plane
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-system-observability
+  labels:
+    aegisai.io/tier: system
+    aegisai.io/component: observability
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+    aegisai.io/cost-center: platform
+    aegisai.io/data-classification: internal
+    aegisai.io/compliance: pci-dss,soc2
+    app.kubernetes.io/name: aegisai-system-observability
+    app.kubernetes.io/component: observability
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: platform-engineering
+  annotations:
+    aegisai.io/owner: platform-engineering
+    aegisai.io/contact: platform@aegisai.io
+    aegisai.io/purpose: Monitoring, logging, and tracing infrastructure

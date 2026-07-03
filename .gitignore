@@ -1,0 +1,92 @@
+# === Python ===
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+*.whl
+*.egg-info/
+
+# === Terraform ===
+terraform/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+crash.log
+crash.*.log
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.iml
+.zensettings
+
+# === OS ===
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+*.lnk
+
+# === Environment / Secrets ===
+.env
+.env.local
+.env.production
+*.pem
+*.key
+*.cert
+credentials.json
+*.cred
+
+# === Build Artifacts ===
+dist/
+build/
+*.tar.gz
+*.zip
+*.tgz
+node_modules/
+.npm/
+.cache/
+
+# === Logs ===
+*.log
+/var/log/
+
+# === Docker ===
+.docker/
+docker-compose.override.yml
+
+# === Git ===
+!.gitkeep
+
+# === Generated Files (must never commit) ===
+repomix-output.xml
+nul
+output.xml
+coverage/
+htmlcov/
+.coverage
+*.py,cover
+.pytest_cache/
+
+# === Large Files (use Git LFS) ===
+*.iso
+*.dmg
+*.exe
+*.msi
+*.pkg
+*.bin
+*.dump
+*.pcap
+*.mp4
+*.mov
+*.avi

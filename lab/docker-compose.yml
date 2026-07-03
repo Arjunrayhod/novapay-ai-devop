@@ -1,0 +1,358 @@
+version: "3.8"
+
+name: aegisai-lab
+
+networks:
+  aegisai:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  vault_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:
+  tempo_data:
+  registry_data:
+
+services:
+  # ==========================================================================
+  # Local Container Registry
+  # ==========================================================================
+  registry:
+    image: registry:2.8.3
+    container_name: aegisai-registry
+    hostname: registry.aegisai.local
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry_data:/var/lib/registry
+    environment:
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
+    networks:
+      aegisai:
+        aliases:
+          - registry.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/v2/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # ==========================================================================
+  # PostgreSQL
+  # ==========================================================================
+  postgres:
+    image: postgres:16.3-alpine
+    container_name: aegisai-postgres
+    hostname: postgres.aegisai.local
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./config/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: aegisai
+      POSTGRES_PASSWORD: aegisai_dev_password
+      POSTGRES_DB: aegisai_platform
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      aegisai:
+        aliases:
+          - postgres.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aegisai -d aegisai_platform"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ==========================================================================
+  # Redis
+  # ==========================================================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: aegisai-redis
+    hostname: redis.aegisai.local
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command:
+      - redis-server
+      - --appendonly yes
+      - --requirepass aegisai_dev_password
+    networks:
+      aegisai:
+        aliases:
+          - redis.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+
+  # ==========================================================================
+  # MinIO (S3-compatible object storage)
+  # ==========================================================================
+  minio:
+    image: minio/minio:RELEASE.2024-06-13T22-53-53Z
+    container_name: aegisai-minio
+    hostname: minio.aegisai.local
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # Console
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: aegisai
+      MINIO_ROOT_PASSWORD: aegisai_dev_password
+      MINIO_DOMAIN: minio.aegisai.local
+    command: server /data --console-address ":9001"
+    networks:
+      aegisai:
+        aliases:
+          - minio.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ==========================================================================
+  # MinIO Bucket Initializer
+  # ==========================================================================
+  minio-init:
+    image: minio/mc:RELEASE.2024-06-13T22-53-53Z
+    container_name: aegisai-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./config/minio/init-buckets.sh:/init-buckets.sh
+    entrypoint: ["/bin/sh", "/init-buckets.sh"]
+    environment:
+      MINIO_ENDPOINT: minio.aegisai.local:9000
+      MINIO_ROOT_USER: aegisai
+      MINIO_ROOT_PASSWORD: aegisai_dev_password
+    networks:
+      - aegisai
+
+  # ==========================================================================
+  # Vault (Secrets Management)
+  # ==========================================================================
+  vault:
+    image: hashicorp/vault:1.17.2
+    container_name: aegisai-vault
+    hostname: vault.aegisai.local
+    ports:
+      - "8200:8200"
+    volumes:
+      - vault_data:/vault/data
+      - ./config/vault/vault.json:/vault/config/vault.json
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_CONFIG_PATH: /vault/config/vault.json
+    command: server
+    networks:
+      aegisai:
+        aliases:
+          - vault.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8200/v1/sys/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  # ==========================================================================
+  # Vault Bootstrap
+  # ==========================================================================
+  vault-bootstrap:
+    image: hashicorp/vault:1.17.2
+    container_name: aegisai-vault-bootstrap
+    depends_on:
+      vault:
+        condition: service_healthy
+    environment:
+      VAULT_ADDR: http://vault:8200
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        vault login root-token-12345
+        vault secrets enable -path=secret kv-v2
+        vault kv put secret/aegisai/database username=aegisai password=aegisai_dev_password
+        vault kv put secret/aegisai/redis password=aegisai_dev_password
+        vault kv put secret/aegisai/minio access_key=aegisai secret_key=aegisai_dev_password
+        vault kv put secret/aegisai/api github_token=fake_github_token_for_dev
+        vault auth enable approle
+        echo "Vault bootstrap complete"
+    networks:
+      - aegisai
+
+  # ==========================================================================
+  # Prometheus (Metrics)
+  # ==========================================================================
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    container_name: aegisai-prometheus
+    hostname: prometheus.aegisai.local
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.enable-lifecycle
+    networks:
+      aegisai:
+        aliases:
+          - prometheus.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ==========================================================================
+  # Grafana (Dashboards)
+  # ==========================================================================
+  grafana:
+    image: grafana/grafana:11.1.0
+    container_name: aegisai-grafana
+    hostname: grafana.aegisai.local
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: grafana-piechart-panel
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/overview.json
+    networks:
+      aegisai:
+        aliases:
+          - grafana.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  # ==========================================================================
+  # Loki (Log Aggregation)
+  # ==========================================================================
+  loki:
+    image: grafana/loki:3.1.0
+    container_name: aegisai-loki
+    hostname: loki.aegisai.local
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+      - ./config/loki/loki.yml:/etc/loki/config.yml
+    command:
+      - -config.file=/etc/loki/config.yml
+    networks:
+      aegisai:
+        aliases:
+          - loki.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3100/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ==========================================================================
+  # Tempo (Distributed Tracing)
+  # ==========================================================================
+  tempo:
+    image: grafana/tempo:2.4.1
+    container_name: aegisai-tempo
+    hostname: tempo.aegisai.local
+    ports:
+      - "3200:3200"   # HTTP
+      - "4317:4317"   # gRPC
+      - "4318:4318"   # HTTP (otlp)
+      - "9411:9411"   # Zipkin
+    volumes:
+      - tempo_data:/tmp/tempo
+      - ./config/tempo/tempo.yml:/etc/tempo/config.yml
+    command:
+      - -config.file=/etc/tempo/config.yml
+    networks:
+      aegisai:
+        aliases:
+          - tempo.aegisai.local
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3200/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ==========================================================================
+  # OpenTelemetry Collector
+  # ==========================================================================
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.103.0
+    container_name: aegisai-otel-collector
+    hostname: otel.aegisai.local
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8888:8888"   # Prometheus metrics
+      - "8889:8889"   # Health check
+    volumes:
+      - ./config/otel-collector/otel-collector.yml:/etc/otel-collector/config.yml
+    command:
+      - --config=/etc/otel-collector/config.yml
+    networks:
+      aegisai:
+        aliases:
+          - otel.aegisai.local
+    restart: unless-stopped
+    depends_on:
+      tempo:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8889/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

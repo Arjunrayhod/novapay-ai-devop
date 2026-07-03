@@ -1,0 +1,17 @@
+# external-secrets AegisAI Platform Component
+# https://external-secrets.io/latest/
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-external-secrets
+
+commonLabels:
+  aegisai.io/component: external-secrets
+  app.kubernetes.io/name: external-secrets
+  app.kubernetes.io/part-of: aegisai
+
+resources:
+  # - generated.yaml
+  - namespace.yaml

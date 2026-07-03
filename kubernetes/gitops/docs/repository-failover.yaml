@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-repository-failover
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gitops-repository-failover
+    aegisai.io/component: documentation
+    aegisai.io/doc-type: repository-failover
+data:
+  title: "Repository Failover Strategy"
+  version: "1.0.0"
+  primary-repository: |
+    URL: https://github.com/novapay/novapay-ai-devops
+    Type: Git
+    Branch: main (production), staging, dev
+    Access: SSH deploy key stored in argocd repo creds
+    Webhook: ArgoCD webhook configured for auto-sync
+  secondary-repository: |
+    URL: https://gitlab.com/novapay/novapay-ai-devops-mirror
+    Type: Git (read-only mirror)
+    Sync: Automated mirror every 15 minutes
+    Access: Read-only deploy key
+    Purpose: Failover target if GitHub is unavailable
+  failover-triggers: |
+    AUTOMATIC FAILOVER:
+      - GitHub API returns 5xx errors for >5 minutes
+      - GitHub webhook delivery failures >3 consecutive attempts
+      - GitHub availability <99.9% over 1-hour sliding window
+
+    MANUAL FAILOVER:
+      - Scheduled GitHub maintenance windows
+      - Known GitHub incident (checked at https://www.githubstatus.com)
+      - Security incident requiring repository isolation
+
+  failover-procedure: |
+    FAILOVER STEPS:
+      Phase 1 - Detection (2 min)
+        1. Confirm GitHub outage:
+           curl -s https://api.github.com/ | head -5
+           Check https://www.githubstatus.com
+        2. Verify mirror is up to date:
+           Check GitLab mirror timestamp
+        3. Decide on failover:
+           - If mirror lags >15 min: consider manual mirror sync
+           - If mirror is current: proceed with failover
+
+      Phase 2 - ArgoCD Reconfiguration (5 min)
+        4. Update argocd-cm repositories list:
+           kubectl edit configmap -n argocd argocd-cm
+           Add secondary repository:
+             - url: https://gitlab.com/novapay/novapay-ai-devops-mirror
+               type: git
+               passwordSecret:
+                 name: gitlab-mirror-token
+                 key: token
+        5. Update all Applications to point to mirror:
+           For each app, update spec.source.repoURL
+           OR update repository credentials to use mirror URL
+        6. Update ApplicationSet repoURLs:
+           kubectl edit applicationset -n argocd <appset-name>
+           Change spec.template.spec.source.repoURL to mirror URL
+
+      Phase 3 - Synchronization (3 min)
+        7. Force refresh of all applications:
+           argocd app list -o name | xargs -I{} argocd app sync {} --force
+        8. Verify sync status:
+           argocd app list -o wide | grep -v Synced
+
+      Phase 4 - Monitoring (ongoing)
+        9. Monitor GitHub status page
+        10. Watch ArgoCD sync stability on mirror
+        11. Prepare for failback
+
+    FAILBACK STEPS:
+      Phase 1 - Verification
+        1. Confirm GitHub is healthy:
+           Check https://www.githubstatus.com
+           Verify API responds:
+           curl -s https://api.github.com/
+        2. Sync mirror with any changes made during outage:
+           git push github main
+
+      Phase 2 - Revert Configuration
+        3. Restore primary repository in argocd-cm:
+           kubectl edit configmap -n argocd argocd-cm
+           Restore original repository configuration
+        4. Revert Application repoURLs to primary
+        5. Revert ApplicationSet repoURLs to primary
+
+      Phase 3 - Resync
+        6. Resync all applications from primary:
+           argocd app list -o name | xargs -I{} argocd app sync {} --force
+        7. Verify all applications healthy from primary
+
+      Phase 4 - Post-Mortem
+        8. Document outage duration and root cause
+        9. Update failover procedure if gaps identified
+        10. Test failover procedure in next DR drill
+
+  runbook-contacts: |
+    Repository Admin: <platform-team> (Slack: #platform-eng)
+    GitHub Admin: <devops-team> (Slack: #devops)
+    GitLab Admin: <devops-team> (Slack: #devops)
+    On-Call Engineer: <oncall> (Slack: @oncall)

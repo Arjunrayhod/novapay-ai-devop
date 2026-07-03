@@ -1,0 +1,19 @@
+# external-secrets Helm values
+# https://external-secrets.io/latest/
+# Generate manifests with:
+#   helm repo add external-secrets https://charts.external-secrets.io
+#   helm template external-secrets external-secrets/external-secrets \
+#     --namespace aegisai-platform-external-secrets \
+#     -f values.yaml > generated.yaml
+
+installCRDs: true
+serviceAccount:
+  create: true
+  name: external-secrets-sa
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi

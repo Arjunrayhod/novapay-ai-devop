@@ -1,0 +1,18 @@
+# ---------------------------------------------------------------------------
+# Development environment overrides
+# ---------------------------------------------------------------------------
+global:
+  environment: dev
+
+aegisai-common:
+  global:
+    environment: dev
+  deployment:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 50m
+        memory: 100Mi
+      limits:
+        cpu: 100m
+        memory: 200Mi

@@ -1,0 +1,40 @@
+# Local .terraform directories
+**/.terraform/
+
+# Terraform state files
+*.tfstate
+*.tfstate.backup
+*.tfstate.*.backup
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Override files - local overrides should not be committed
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Terratest temporary files
+.terratest*
+
+# Plan files - never commit generated plans
+*.plan
+tfplan
+out.plan
+
+# Terragrunt (if used later)
+**/.terragrunt-cache/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store

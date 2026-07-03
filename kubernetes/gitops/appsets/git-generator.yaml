@@ -1,0 +1,96 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: git-directory-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: git-directory-apps
+    aegisai.io/generator: git
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - git:
+        repoURL: https://github.com/novapay/novapay-ai-devops
+        revision: HEAD
+        directories:
+          - path: "kubernetes/apps/*"
+  template:
+    metadata:
+      name: "{{path.basename}}"
+      labels:
+        app.kubernetes.io/name: "{{path.basename}}"
+        aegisai.io/generator: git-directory
+    spec:
+      project: platform
+      source:
+        repoURL: https://github.com/novapay/novapay-ai-devops
+        targetRevision: HEAD
+        path: "{{path}}"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "aegisai-{{path.basename}}"
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true
+          - RespectIgnoreDifferences=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: git-scm-provider-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: git-scm-provider-apps
+    aegisai.io/generator: git-scm
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - scmProvider:
+        github:
+          organization: novapay
+          repository: novapay-ai-devops
+          api: https://api.github.com/
+          allBranches: true
+  template:
+    metadata:
+      name: "{{repository}}-{{branch}}"
+      labels:
+        app.kubernetes.io/name: "{{repository}}-{{branch}}"
+        aegisai.io/generator: scm-provider
+    spec:
+      project: platform
+      source:
+        repoURL: "{{ssh_url}}"
+        targetRevision: "{{branch}}"
+        path: kubernetes/gitops/applications
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true
+          - RespectIgnoreDifferences=true

@@ -1,0 +1,68 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: main
+  namespace: aegisai-observability
+  labels:
+    app.kubernetes.io/name: main
+    app.kubernetes.io/component: prometheus
+spec:
+  version: v2.53.0
+  serviceAccountName: prometheus
+  serviceMonitorSelector:
+    matchLabels:
+      aegisai.io/scrape: prometheus
+  podMonitorSelector:
+    matchLabels:
+      aegisai.io/scrape: prometheus
+  ruleSelector:
+    matchLabels:
+      aegisai.io/rule: prometheus
+  alerting:
+    alertmanagers:
+      - namespace: aegisai-observability
+        name: alertmanager-main
+        port: web
+  retention: 15d
+  retentionSize: 50GB
+  scrapeInterval: 30s
+  evaluationInterval: 30s
+  replicas: 2
+  shards: 1
+  resources:
+    requests:
+      cpu: "1"
+      memory: "2Gi"
+    limits:
+      cpu: "4"
+      memory: "8Gi"
+  storage:
+    volumeClaimTemplate:
+      spec:
+        storageClassName: standard
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+  priorityClassName: observability-high
+  nodeSelector:
+    kubernetes.io/os: linux
+  tolerations:
+    - effect: NoSchedule
+      key: node-role.kubernetes.io/infra
+      operator: Exists
+  securityContext:
+    runAsUser: 65534
+    runAsGroup: 65534
+    fsGroup: 65534
+    runAsNonRoot: true
+  podMetadata:
+    labels:
+      aegisai.io/metrics: prometheus
+  enableAdminAPI: false
+  walCompression: true
+  externalLabels:
+    cluster: in-cluster
+    environment: production
+  remoteWrite: []

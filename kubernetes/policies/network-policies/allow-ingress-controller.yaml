@@ -1,0 +1,38 @@
+# Allow ingress from the ingress controller (nginx, istio gateway).
+# Applied to all workload namespaces that expose HTTP services.
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: aegisai-allow-ingress-controller
+  labels:
+    aegisai.io/policy-type: allow-ingress
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              aegisai.io/tier: platform
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              aegisai.io/tier: platform
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: istio-ingressgateway
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 443

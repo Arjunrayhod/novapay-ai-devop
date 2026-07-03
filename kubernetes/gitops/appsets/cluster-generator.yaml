@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-cluster-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: platform-cluster-apps
+    aegisai.io/generator: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            aegisai.io/cluster-type: platform
+  template:
+    metadata:
+      name: "{{name}}-platform-apps"
+      labels:
+        app.kubernetes.io/name: "{{name}}-platform-apps"
+        aegisai.io/cluster: "{{name}}"
+    spec:
+      project: platform
+      source:
+        repoURL: https://github.com/novapay/novapay-ai-devops
+        targetRevision: HEAD
+        path: kubernetes/platform/{{name}}
+      destination:
+        server: "{{server}}"
+        namespace: aegisai-platform
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true
+          - RespectIgnoreDifferences=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-environment-apps
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: platform-environment-apps
+    aegisai.io/generator: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+    - clusters:
+        selector:
+          matchLabels:
+            aegisai.io/cluster-type: environment
+  template:
+    metadata:
+      name: "{{name}}-environment"
+      labels:
+        app.kubernetes.io/name: "{{name}}-environment"
+        aegisai.io/cluster: "{{name}}"
+    spec:
+      project: "environment-{{name}}"
+      source:
+        repoURL: https://github.com/novapay/novapay-ai-devops
+        targetRevision: HEAD
+        path: "kubernetes/envs/{{name}}"
+      destination:
+        server: "{{server}}"
+        namespace: argocd
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+          allowEmpty: false
+        syncOptions:
+          - CreateNamespace=true
+          - PruneLast=true
+          - ApplyOutOfSyncOnly=true
+          - RespectIgnoreDifferences=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 10s
+            factor: 2
+            maxDuration: 3m

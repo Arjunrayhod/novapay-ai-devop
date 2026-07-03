@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: environment-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: environment-staging
+    app.kubernetes.io/part-of: argocd
+    aegisai.io/environment: staging
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  description: Staging environment project
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: 'aegisai-*-staging'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  syncWindows:
+    - kind: allow
+      schedule: '0 0 * * *'
+      duration: 168h
+      applications:
+        - '*'
+  orphanedResources:
+    warn: true

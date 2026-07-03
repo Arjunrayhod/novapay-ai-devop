@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-platform-external-secrets
+  labels:
+    aegisai.io/tier: platform
+    aegisai.io/component: external-secrets
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest

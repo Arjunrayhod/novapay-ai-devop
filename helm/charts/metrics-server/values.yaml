@@ -1,0 +1,139 @@
+# ---------------------------------------------------------------------------
+# Global values — propagated to all subcharts including aegisai-common
+# Also consumed by this chart's own templates via aegisai-common helpers
+# ---------------------------------------------------------------------------
+global:
+  environment: dev
+  tier: platform
+  dataClassification: internal
+  owner: platform-kubernetes
+  costCenter: platform
+
+component: metrics-server
+partOf: aegisai
+
+# ---------------------------------------------------------------------------
+# aegisai-common subchart overrides
+# ---------------------------------------------------------------------------
+aegisai-common:
+  nameOverride: metrics-server
+  fullnameOverride: metrics-server
+  component: metrics-server
+  partOf: aegisai
+  priorityClassName: aegisai-platform-critical
+
+  image:
+    repository: registry.k8s.io/metrics-server/metrics-server
+    tag: v0.7.2
+    pullPolicy: IfNotPresent
+
+  service:
+    enabled: true
+    type: ClusterIP
+    ports:
+      - name: https
+        port: 443
+        targetPort: https
+        protocol: TCP
+
+  deployment:
+    enabled: true
+    replicas: 2
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    containerPorts:
+      - name: https
+        containerPort: 10250
+        protocol: TCP
+    args:
+      - --kubelet-preferred-address-types=InternalIP
+      - --kubelet-insecure-tls
+      - --cert-dir=/tmp/certs
+      - --metric-resolution=15s
+    resources:
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 200m
+        memory: 300Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 1000
+      runAsGroup: 1000
+      fsGroup: 1000
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+    livenessProbe:
+      httpGet:
+        path: /livez
+        port: https
+        scheme: HTTPS
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: https
+        scheme: HTTPS
+      initialDelaySeconds: 5
+      periodSeconds: 5
+      timeoutSeconds: 3
+      failureThreshold: 2
+    startupProbe:
+      httpGet:
+        path: /readyz
+        port: https
+        scheme: HTTPS
+      initialDelaySeconds: 3
+      periodSeconds: 3
+      timeoutSeconds: 3
+      failureThreshold: 10
+    nodeSelector:
+      kubernetes.io/os: linux
+    tolerations:
+      - key: CriticalAddonsOnly
+        operator: Exists
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: topology.kubernetes.io/zone
+    topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+    volumes:
+      - name: tmp
+        emptyDir: {}
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp/certs
+
+  configmap:
+    enabled: false
+
+  serviceAccount:
+    enabled: true
+    create: true
+    name: metrics-server
+    automountServiceAccountToken: true
+
+  hpa:
+    enabled: false
+
+  pdb:
+    enabled: true
+    minAvailable: 1

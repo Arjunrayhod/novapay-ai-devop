@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prod-cluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: prod-cluster
+    app.kubernetes.io/part-of: argocd
+    argocd.argoproj.io/secret-type: cluster
+    aegisai.io/cluster-type: environment
+    aegisai.io/environment: prod
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+type: Opaque
+stringData:
+  name: prod
+  server: https://prod-cluster.novapay.io:6443
+  config: |
+    {
+      "bearerToken": "",
+      "tlsClientConfig": {
+        "insecure": false
+      }
+    }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Cluster
+metadata:
+  name: prod
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: prod
+    app.kubernetes.io/part-of: argocd
+    aegisai.io/cluster-type: environment
+    aegisai.io/environment: prod
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  name: prod
+  server: https://prod-cluster.novapay.io:6443
+  namespaces:
+    - argocd
+    - aegisai-*-prod
+    - default
+    - kube-system
+  config:
+    tlsClientConfig:
+      insecure: false

@@ -1,0 +1,9 @@
+aws_region           = "ap-south-1"
+name_prefix          = "aegisai"
+kms_key_alias        = "alias/terraform-state-key"
+kms_deletion_window  = 30
+enable_kms_key_rotation = true
+
+# Optional: override auto-generated bucket/table names
+# state_bucket_name     = "my-company-terraform-state-123456789012"
+# state_lock_table_name = "my-company-terraform-locks"

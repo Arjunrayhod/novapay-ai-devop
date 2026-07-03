@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-architecture
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gitops-architecture
+    aegisai.io/component: documentation
+    aegisai.io/doc-type: architecture
+data:
+  title: "Enterprise GitOps Architecture"
+  version: "1.0.0"
+  architecture-overview: |
+    The Novapay AI GitOps platform follows a layered enterprise architecture:
+
+    Layer 1: Control Plane (ArgoCD)
+      - ArgoCD v2.12.0 installed via Kustomize remote base
+      - HA configuration with multiple replicas
+      - RBAC with OIDC integration
+      - Notification controller for Slack + email alerts
+
+    Layer 2: Project Model (AppProjects)
+      - Platform project: All ArgoCD-managed infrastructure
+      - Environment projects: Dev, Staging, Prod with scoped destinations
+      - RBAC roles: Admin (full access), CI (sync-only), ReadOnly
+
+    Layer 3: Application Management (App of Apps + ApplicationSets)
+      - App of Apps: Root Application manages child Applications
+      - ApplicationSets: Dynamic app generation per cluster, per directory
+      - Sync waves: Ordered deployment from -2 (creds) to 10 (PostSync hooks)
+
+    Layer 4: Progressive Delivery (Argo Rollouts)
+      - Argo Rollouts v1.7.1 for canary and blue-green deployments
+      - AnalysisTemplate-backed metrics (error-rate, latency, success-rate)
+      - Automated rollback on metric threshold violations
+
+    Layer 5: Multi-Cluster
+      - Cluster definitions for in-cluster, staging, and production
+      - ApplicationSet cluster generators for per-cluster deployments
+      - Matrix generators for cluster x service/addon combinations
+
+    Layer 6: Security & Compliance
+      - Repository credentials managed by External Secrets Operator
+      - Pod Security Standards enforced via namespace labels
+      - Sync Windows prevent production changes during business hours
+      - Audit logging via ArgoCD audit trails
+
+  architecture-diagram: |
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                    Git Repository (Source of Truth)              │
+    │  github.com/novapay/novapay-ai-devops                           │
+    │  ├── kubernetes/gitops/     (ArgoCD control plane)              │
+    │  ├── kubernetes/platform/   (Platform addons)                   │
+    │  ├── kubernetes/apps/       (Application manifests)             │
+    │  ├── kubernetes/services/   (Per-cluster services)              │
+    │  ├── kubernetes/envs/       (Environment overlays)              │
+    │  └── kubernetes/addons/     (Cluster-addon components)          │
+    └────────────────────┬────────────────────────────────────────────┘
+                         │ Webhook / Polling
+                         ▼
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                    ArgoCD Control Plane                          │
+    │                                                                  │
+    │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+    │  │  App of Apps  │  │ Application  │  │  Notifications       │  │
+    │  │  (Root App)   │──│   Sets       │  │  (Slack + Email)     │  │
+    │  └──────┬───────┘  └──────┬───────┘  └──────────────────────┘  │
+    │         │                  │                                     │
+    │  ┌──────┴──────────────────┴───────┐                            │
+    │  │         AppProjects              │                            │
+    │  │  platform | env-dev | env-staging | env-prod                 │
+    │  └──────────────────────────────────┘                            │
+    │                                                                  │
+    │  ┌──────────────────────────────────────────────────────────┐   │
+    │  │  Sync Hooks: PreSync (migrate) → Sync (seed) → PostSync  │   │
+    │  │  Rollouts:  Canary (10→30→60→100%) │ BlueGreen (preview) │   │
+    │  │  Analysis:  ErrorRate │ Latency(P99) │ SuccessRate(99.5%)│   │
+    │  └──────────────────────────────────────────────────────────┘   │
+    └────────────────────┬────────────────────────────────────────────┘
+                         │ Cluster Registration
+                         ▼
+    ┌─────────────────────────────────────────────────────────────────┐
+    │                    Target Clusters                               │
+    │                                                                  │
+    │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────┐  │
+    │  │   in-cluster  │  │   staging     │  │   production         │  │
+    │  │  (Platform)   │  │  (env:stg)   │  │  (env:prod)          │  │
+    │  ├──────────────┤  ├──────────────┤  ├──────────────────────┤  │
+    │  │ - ArgoCD     │  │ - Apps       │  │ - Services           │  │
+    │  │ - Rollouts   │  │ - Services   │  │ - Critical workloads │  │
+    │  │ - Addons     │  │ - Addons     │  │ - HA configurations  │  │
+    │  └──────────────┘  └──────────────┘  └──────────────────────┘  │
+    └─────────────────────────────────────────────────────────────────┘
+
+  component-interactions: |
+    Webhook Flow:
+      Git push → GitHub webhook → ArgoCD → App refresh → Sync → Deploy
+
+    Sync Flow:
+      Admin sync → ArgoCD evaluates → PreSync hook → Apply manifests
+      → AnalysisRun → Promotion → PostSync hook → Smoke test → Complete
+
+    Rollback Flow:
+      AnalysisRun fails → Rollout abort → Auto-undo to previous revision
+      → Scale down new → Scale up old → Notify Slack → Health check
+
+    Multi-Cluster Flow:
+      AppSet cluster gen → Template per cluster → Apply to each destination
+      → Sync hooks per cluster → Analysis per cluster → Promotion per cluster
+
+  decision-log: |
+    AD-001: GitOps Tool - ArgoCD (declarative, K8s-native, multi-cluster)
+    AD-002: Install Method - Kustomize remote base pinned to v2.12.0
+    AD-003: App Management - App of Apps + ApplicationSets (hybrid)
+    AD-004: Project Model - Single platform + per-environment projects
+    AD-005: Sync Strategy - Automated with SelfHeal for all non-prod
+    AD-006: Prod Sync - Manual approval required, automated disabled
+    AD-007: Progressive Delivery - Argo Rollouts (canary + blue-green)
+    AD-008: Metrics Analysis - Prometheus-backed AnalysisTemplates
+    AD-009: Multi-Cluster - Cluster CRD + Secret with typed labels
+    AD-010: Notifications - Slack (operational) + Email (audit trail)
+    AD-011: Secrets Management - External Secrets Operator (ESO)
+    AD-012: Sync Hooks - PreSync (migrate), Sync (seed), PostSync (test)
+    AD-013: Backup Philosophy - Git is source of truth, ConfigMaps backed up
+    AD-014: Generator Strategy - Cluster (env), Git (dirs), Matrix (combo)

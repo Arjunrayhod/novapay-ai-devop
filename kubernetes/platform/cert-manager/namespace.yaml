@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-platform-cert-manager
+  labels:
+    aegisai.io/tier: platform
+    aegisai.io/component: cert-manager
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest

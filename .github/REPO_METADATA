@@ -1,0 +1,19 @@
+# AegisAI Platform Repository Metadata
+
+This file documents repository-level metadata used by tooling and automation.
+Do not edit manually — managed by Platform Engineering.
+
+REPO_NAME=aegisai-devsecops-platform
+REPO_DESCRIPTION="Enterprise Internal Developer Platform for AI-assisted DevOps, DevSecOps, SRE, and cloud engineering for regulated financial workloads"
+REPO_TOPICS=devops,devsecops,sre,kubernetes,terraform,gitops,finops,compliance,ai,platform-engineering
+REPO_LANGUAGE=Python
+REPO_LICENSE=Proprietary
+REPO_DEFAULT_BRANCH=main
+REPO_VISIBILITY=private
+TEAM_PLATFORM_INFRA=@aegisai/platform-infra
+TEAM_PLATFORM_K8S=@aegisai/platform-k8s
+TEAM_PLATFORM_ENG=@aegisai/platform-eng
+TEAM_DEVSECOPS=@aegisai/devsecops
+TEAM_AI_PLATFORM=@aegisai/ai-platform
+TEAM_SECURITY=@aegisai/security
+TEAM_ARCHITECTURE=@aegisai/architecture

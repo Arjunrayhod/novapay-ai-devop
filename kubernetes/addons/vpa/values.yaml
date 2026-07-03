@@ -1,0 +1,19 @@
+# VPA Helm values for AegisAI platform.
+# Default mode: "Off" (recommend only — no auto-updates).
+
+recommender:
+  enabled: true
+  extraArgs:
+    vpa-object-namespace: "*"
+    metrics-for-rec recommendation: ""
+
+updater:
+  enabled: true
+  extraArgs:
+    min-replicas: "2"
+
+admissionController:
+  enabled: true
+
+metrics:
+  enabled: true

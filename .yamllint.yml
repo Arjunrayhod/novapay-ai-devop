@@ -1,0 +1,68 @@
+extends: default
+
+rules:
+  # 80 chars is too restrictive for YAML docs
+  line-length:
+    level: warning
+    max: 120
+    allow-non-breakable-inline-mappings: true
+
+  # Allow truthy values (not just true/false)
+  truthy: disable
+
+  # Allow document start (---)
+  document-start: disable
+
+  # Allow comments
+  comments: enable
+  comments-indentation: enable
+
+  # Indentation
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+    check-multi-line-strings: false
+
+  # Braces spacing
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+  # Brackets spacing
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+  # Colons
+  colons:
+    max-spaces-after: 1
+
+  # Commas
+  commas:
+    max-spaces-after: 1
+
+  # Empty lines
+  empty-lines:
+    max: 2
+    max-start: 0
+    max-end: 0
+
+  # Hyphens
+  hyphens:
+    max-spaces-after: 1
+
+  # Quotes
+  quoted-strings:
+    quote-type: single
+    required: false
+
+  # Key ordering
+  key-ordering: disable
+
+ignore: |
+  .git/
+  .venv/
+  node_modules/
+  __pycache__/
+  *.lock
+  .terraform/

@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: staging-cluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: staging-cluster
+    app.kubernetes.io/part-of: argocd
+    argocd.argoproj.io/secret-type: cluster
+    aegisai.io/cluster-type: environment
+    aegisai.io/environment: staging
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+type: Opaque
+stringData:
+  name: staging
+  server: https://staging-cluster.novapay.io:6443
+  config: |
+    {
+      "bearerToken": "",
+      "tlsClientConfig": {
+        "insecure": false
+      }
+    }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Cluster
+metadata:
+  name: staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: staging
+    app.kubernetes.io/part-of: argocd
+    aegisai.io/cluster-type: environment
+    aegisai.io/environment: staging
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  name: staging
+  server: https://staging-cluster.novapay.io:6443
+  namespaces:
+    - argocd
+    - aegisai-*-staging
+    - default
+    - kube-system
+  config:
+    tlsClientConfig:
+      insecure: false

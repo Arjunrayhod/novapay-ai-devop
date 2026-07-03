@@ -1,0 +1,93 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "title": "AegisAI Lab Overview",
+  "version": 1,
+  "uid": "aegisai-lab-overview",
+  "schemaVersion": 39,
+  "tags": ["aegisai", "lab"],
+  "timezone": "browser",
+  "editable": true,
+  "refresh": "30s",
+  "panels": [
+    {
+      "title": "Cluster Status",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "expr": "count(kube_pod_info)",
+          "legendFormat": "Pods"
+        }
+      ]
+    },
+    {
+      "title": "Service Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      },
+      "targets": [
+        {
+          "expr": "count(up == 1)",
+          "legendFormat": "Healthy"
+        }
+      ]
+    },
+    {
+      "title": "Loki Log Volume",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "id": 3,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "rate(loki_request_duration_seconds_count[5m])",
+          "legendFormat": "Loki Requests"
+        }
+      ]
+    },
+    {
+      "title": "Tempo Trace Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 },
+      "id": 4,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "rate(tempo_receiver_spans_received_total[5m])",
+          "legendFormat": "Spans/sec"
+        }
+      ]
+    },
+    {
+      "title": "Ingester Metrics",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 },
+      "id": 5,
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom" }
+      },
+      "targets": [
+        {
+          "expr": "rate(tempo_ingester_bytes_received_total[5m])",
+          "legendFormat": "Ingester bytes/sec"
+        }
+      ]
+    }
+  ]
+}

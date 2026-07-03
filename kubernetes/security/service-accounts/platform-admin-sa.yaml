@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aegisai-platform-admin
+  namespace: aegisai-system-security
+  annotations:
+    aegisai.io/service-account-type: platform-admin
+    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA module
+  labels:
+    aegisai.io/rbac-tier: platform

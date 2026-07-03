@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-staging
+  annotations:
+    aegisai.io/environment: staging
+
+commonLabels:
+  aegisai.io/environment: staging
+
+commonAnnotations:
+  aegisai.io/environment-tier: staging
+
+resources:
+  - ../../base
+  - ../../namespaces
+  - ../../security
+  - ../../policies
+  - ../../storage
+  - ../../networking
+  - ../../observability
+  # managed by individual ArgoCD Applications in kubernetes/gitops/applications/
+
+# patches moved to individual ArgoCD Application specs

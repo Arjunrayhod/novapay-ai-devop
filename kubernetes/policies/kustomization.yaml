@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-policies
+
+resources:
+  - network-policies/default-deny-all.yaml
+  - network-policies/allow-dns.yaml
+  - network-policies/allow-same-namespace.yaml
+  - network-policies/allow-kube-apiserver.yaml
+  - network-policies/allow-intra-tier.yaml
+  - network-policies/allow-platform.yaml
+  - network-policies/allow-ingress-controller.yaml
+  - priority-classes/platform-critical.yaml
+  - priority-classes/security-critical.yaml
+  - priority-classes/observability-critical.yaml
+  - priority-classes/application-high.yaml
+  - priority-classes/application-normal.yaml
+  - priority-classes/batch-low.yaml

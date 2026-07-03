@@ -1,0 +1,11 @@
+environment       = "example"
+vpc_cidr          = "10.99.0.0/16"
+availability_zones = ["ap-south-1a", "ap-south-1b"]
+enable_nat_gateway = true
+single_nat_gateway = true
+
+tags = {
+  Environment = "example"
+  ManagedBy   = "terraform"
+  Example     = "basic-vpc"
+}

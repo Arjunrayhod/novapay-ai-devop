@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: aegisai-quota-observability
+  annotations:
+    aegisai.io/quota-tier: observability
+spec:
+  hard:
+    pods: "50"
+    requests.cpu: "16"
+    requests.memory: 64Gi
+    limits.cpu: "32"
+    limits.memory: 128Gi
+    configmaps: "30"
+    secrets: "20"
+    persistentvolumeclaims: "10"
+    services: "15"

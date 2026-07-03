@@ -1,0 +1,66 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+rule_files:
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: prometheus
+          environment: lab
+
+  - job_name: "otel-collector"
+    scrape_interval: 10s
+    static_configs:
+      - targets: ["otel-collector:8888"]
+        labels:
+          service: otel-collector
+          environment: lab
+
+  - job_name: "docker-containers"
+    scrape_interval: 15s
+    static_configs:
+      - targets:
+          - "postgres:9187"
+          - "redis:9121"
+          - "vault:8200"
+        labels:
+          environment: lab
+
+  - job_name: "loki"
+    static_configs:
+      - targets: ["loki:3100"]
+        labels:
+          service: loki
+          environment: lab
+
+  - job_name: "tempo"
+    static_configs:
+      - targets: ["tempo:3200"]
+        labels:
+          service: tempo
+          environment: lab
+
+  - job_name: "grafana"
+    static_configs:
+      - targets: ["grafana:3000"]
+        labels:
+          service: grafana
+          environment: lab
+
+  - job_name: "minio"
+    metrics_path: /minio/v2/metrics/cluster
+    static_configs:
+      - targets: ["minio:9000"]
+        labels:
+          service: minio
+          environment: lab

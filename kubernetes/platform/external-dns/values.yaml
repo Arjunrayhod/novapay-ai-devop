@@ -1,0 +1,23 @@
+# external-dns Helm values for AegisAI platform.
+
+provider: aws
+
+aws:
+  region: ap-south-1
+  zoneType: public
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA
+
+policy: sync
+txtOwnerId: aegisai
+registry: txt
+
+domainFilters:
+  - apps.aegisai.io
+  - internal.aegisai.io
+
+sources:
+  - ingress
+  - service
