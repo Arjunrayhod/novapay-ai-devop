@@ -6,4 +6,6 @@ metadata:
     aegisai.io/priority-tier: observability
 value: 8000
 globalDefault: false
-description: "For observability stack — Prometheus, Grafana, Loki, Alertmanager. Ensures monitoring continuity during resource contention."
+description: >
+  'For observability stack — Prometheus, Grafana, Loki, Alertmanager.
+  Ensures monitoring continuity during resource contention.'

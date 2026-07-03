@@ -6,4 +6,7 @@ metadata:
     aegisai.io/priority-tier: batch
 value: -100
 globalDefault: false
-description: "For non-critical batch jobs, CI runners, data-processing pipelines. Preemptible by all other priority classes. Suitable for workloads that can tolerate restart or delayed execution."
+description: >
+  'For non-critical batch jobs, CI runners, data-processing pipelines.
+  Preemptible by all other priority classes. Suitable for workloads
+  that can tolerate restart or delayed execution.'

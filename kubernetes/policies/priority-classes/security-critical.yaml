@@ -6,4 +6,7 @@ metadata:
     aegisai.io/priority-tier: security
 value: 9000
 globalDefault: false
-description: "For security components — OPA/Gatekeeper, Falco, auth proxies. Preempted only by platform-critical. Ensures security posture during resource contention."
+description: >
+  'For security components — OPA/Gatekeeper, Falco, auth proxies.
+  Preempted only by platform-critical. Ensures security posture
+  during resource contention.'

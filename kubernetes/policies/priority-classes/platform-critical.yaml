@@ -6,4 +6,7 @@ metadata:
     aegisai.io/priority-tier: platform
 value: 10000
 globalDefault: false
-description: "For platform infrastructure components — ingress controllers, cert-manager, external-dns, cluster-autoscaler. Highest user-defined priority. Never preempted by application workloads."
+description: >
+  'For platform infrastructure components — ingress controllers,
+  cert-manager, external-dns, cluster-autoscaler. Highest user-defined
+  priority. Never preempted by application workloads.'
