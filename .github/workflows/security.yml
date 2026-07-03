@@ -65,22 +65,22 @@ jobs:
             --directory . \
             --framework terraform kubernetes dockerfile \
             --output sarif \
-            --output-file-path checkov-results.sarif \
-            --skip-check CKV_SECRET_* \
+            --output-file-path . \
+            --skip-check 'CKV_SECRET_*' \
             --compact
       - name: Upload Checkov SARIF
-        if: always() && hashFiles('checkov-results.sarif') != ''
+        if: always() && hashFiles('results_sarif.sarif') != ''
         uses: actions/upload-artifact@v4
         with:
           name: checkov-results
-          path: checkov-results.sarif
+          path: results_sarif.sarif
           retention-days: 30
           overwrite: true
       - name: Upload Checkov report to GitHub Security
-        if: always() && hashFiles('checkov-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3.28.0
+        if: always() && hashFiles('results_sarif.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3.36.2
         with:
-          sarif_file: checkov-results.sarif
+          sarif_file: results_sarif.sarif
           category: checkov
 
   semgrep:
@@ -115,7 +115,7 @@ jobs:
           overwrite: true
       - name: Upload Semgrep report to GitHub Security
         if: always() && hashFiles('semgrep-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3.28.0
+        uses: github/codeql-action/upload-sarif@v3.36.2
         with:
           sarif_file: semgrep-results.sarif
           category: semgrep
