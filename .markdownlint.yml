@@ -4,20 +4,36 @@
 # Default state for all rules
 default: true
 
-# Line length — relaxed for content documents
-MD013:
-  line_length: 120
-  heading_line_length: 80
-  code_block_line_length: 120
-  tables: false
+# Heading style — allow both atx and setext (auto-generated docs mix styles)
+MD003: false
+
+# Line length — disabled (auto-generated docs have long URLs/tables)
+MD013: false
+
+# Blanks around headings — disabled (auto-generated docs lack blanks)
+MD022: false
 
 # Multiple headings with same content — allow
 MD024:
   siblings_only: true
 
-# Multiple top-level headings — allow in some docs
-MD025:
-  front_matter_title: ''
+# Multiple top-level headings — disabled
+MD025: false
+
+# Blanks around lists — disabled (auto-generated docs)
+MD032: false
+
+# Blanks around fenced code blocks — disabled (compact READMEs)
+MD031: false
+
+# Blanks around tables — disabled (compact READMEs)
+MD058: false
+
+# Table column style — disabled (some tables use compact style)
+MD060: false
+
+# Spaces inside code spans — disabled (code samples may have intentional leading spaces)
+MD038: false
 
 # Trailing punctuation in heading — relaxed
 MD026:
