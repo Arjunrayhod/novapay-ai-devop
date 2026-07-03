@@ -202,7 +202,7 @@ jobs:
       - name: Build Docker image for SBOM
         run: docker build -t ${{ env.IMAGE_NAME }}:sbom -f Dockerfile .
       - name: Generate ${{ matrix.format }} SBOM
-        uses: anchore/sbom-action@v1
+        uses: anchore/sbom-action@v0.24.0
         with:
           image: ${{ env.IMAGE_NAME }}:sbom
           format: ${{ matrix.syft-format }}
