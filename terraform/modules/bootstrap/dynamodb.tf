@@ -37,11 +37,11 @@ data "aws_iam_policy_document" "dynamodb_lock" {
 }
 
 resource "aws_dynamodb_table" "state_lock" {
-  name           = local.table_name
-  billing_mode   = var.lock_table_billing_mode
-  hash_key       = "LockID"
-  table_class    = "STANDARD"
-  tags           = local.merged_tags
+  name         = local.table_name
+  billing_mode = var.lock_table_billing_mode
+  hash_key     = "LockID"
+  table_class  = "STANDARD"
+  tags         = local.merged_tags
 
   attribute {
     name = "LockID"

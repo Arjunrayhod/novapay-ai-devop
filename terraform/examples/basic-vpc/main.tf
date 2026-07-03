@@ -16,7 +16,7 @@
 
 output "note" {
   description = "Example setup guide"
-  value = <<-EOT
+  value       = <<-EOT
     This example demonstrates the VPC module pattern.
     To use:
     1. Implement the VPC module in modules/vpc/

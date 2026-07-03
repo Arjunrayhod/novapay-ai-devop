@@ -29,7 +29,7 @@ module "iam" {
   create_cross_account_role       = false
 
   create_github_oidc_provider = false
-  require_mfa                = false
+  require_mfa                 = false
 
   create_permission_boundary = true
 }
@@ -54,7 +54,7 @@ output "permission_boundary" {
 resource "terraform_data" "validate_roles_count" {
   lifecycle {
     precondition {
-      condition     = alltrue([
+      condition = alltrue([
         module.iam.platform_admin_role_arn != null,
         module.iam.platform_operator_role_arn != null,
         module.iam.cicd_role_arn != null,

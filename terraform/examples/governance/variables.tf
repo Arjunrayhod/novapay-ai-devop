@@ -101,7 +101,7 @@ variable "expiration_date" {
 variable "additional_tags" {
   description = "Additional tags to merge with governance tags"
   type        = map(string)
-  default     = {
+  default = {
     Demo = "governance-example"
   }
 }

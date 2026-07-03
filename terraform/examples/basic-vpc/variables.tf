@@ -31,7 +31,7 @@ variable "single_nat_gateway" {
 variable "tags" {
   description = "Resource tags"
   type        = map(string)
-  default     = {
+  default = {
     Environment = "example"
     ManagedBy   = "terraform"
     Example     = "basic-vpc"

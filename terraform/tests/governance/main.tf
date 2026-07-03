@@ -34,10 +34,10 @@ provider "aws" {
 module "governance_minimal" {
   source = "../../modules/governance"
 
-  environment     = "dev"
-  workload        = "test-minimal"
-  owner           = "platform-engineering"
-  cost_center     = "cc-platform"
+  environment = "dev"
+  workload    = "test-minimal"
+  owner       = "platform-engineering"
+  cost_center = "cc-platform"
 }
 
 resource "terraform_data" "test_minimal" {
@@ -68,14 +68,14 @@ resource "terraform_data" "test_minimal" {
 module "governance_production" {
   source = "../../modules/governance"
 
-  environment           = "prod"
-  workload              = "test-production"
-  owner                 = "security-team"
-  cost_center           = "cc-security"
-  data_classification   = "restricted"
-  compliance_frameworks = ["pci-dss", "soc2", "rbi"]
-  resource_criticality  = "critical"
-  environment_tier      = "production"
+  environment                    = "prod"
+  workload                       = "test-production"
+  owner                          = "security-team"
+  cost_center                    = "cc-security"
+  data_classification            = "restricted"
+  compliance_frameworks          = ["pci-dss", "soc2", "rbi"]
+  resource_criticality           = "critical"
+  environment_tier               = "production"
   requires_encryption_at_rest    = true
   requires_encryption_in_transit = true
   requires_backup                = true
@@ -108,12 +108,12 @@ resource "terraform_data" "test_production" {
 module "governance_ephemeral" {
   source = "../../modules/governance"
 
-  environment         = "dev"
-  workload            = "test-ephemeral"
-  owner               = "developer-team"
-  cost_center         = "cc-engineering"
-  environment_tier    = "ephemeral"
-  expiration_date     = "2026-12-31"
+  environment          = "dev"
+  workload             = "test-ephemeral"
+  owner                = "developer-team"
+  cost_center          = "cc-engineering"
+  environment_tier     = "ephemeral"
+  expiration_date      = "2026-12-31"
   resource_criticality = "low"
 }
 

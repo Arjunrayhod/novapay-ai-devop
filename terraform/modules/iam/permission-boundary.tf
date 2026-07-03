@@ -108,7 +108,7 @@ data "aws_iam_policy_document" "permission_boundary" {
     condition {
       test     = "StringLike"
       variable = "iam:PassedToService"
-      values   = [
+      values = [
         "ec2.amazonaws.com",
         "eks.amazonaws.com",
         "eks-fargate-pods.amazonaws.com",

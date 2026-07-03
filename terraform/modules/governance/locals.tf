@@ -4,61 +4,61 @@
 
 locals {
   region_short = {
-    ap-south-1      = "aps1"
-    ap-southeast-1  = "apse1"
-    ap-southeast-2  = "apse2"
-    ap-northeast-1  = "apne1"
-    eu-west-1       = "ew1"
-    eu-west-2       = "ew2"
-    eu-central-1    = "ec1"
-    us-east-1       = "ue1"
-    us-east-2       = "ue2"
-    us-west-1       = "uw1"
-    us-west-2       = "uw2"
-    sa-east-1       = "sae1"
-    ca-central-1    = "cac1"
+    ap-south-1     = "aps1"
+    ap-southeast-1 = "apse1"
+    ap-southeast-2 = "apse2"
+    ap-northeast-1 = "apne1"
+    eu-west-1      = "ew1"
+    eu-west-2      = "ew2"
+    eu-central-1   = "ec1"
+    us-east-1      = "ue1"
+    us-east-2      = "ue2"
+    us-west-1      = "uw1"
+    us-west-2      = "uw2"
+    sa-east-1      = "sae1"
+    ca-central-1   = "cac1"
   }
 
   region_code = try(local.region_short[var.aws_region], "other")
 
-# ---------------------------------------------------------------------------
-# Tagging — mandatory base tags
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — mandatory base tags
+  # ---------------------------------------------------------------------------
 
   mandatory_tags = {
-    Environment     = var.environment
-    ManagedBy       = "terraform"
-    Platform        = var.name_prefix
-    Project         = "${var.name_prefix}-platform"
-    Workload        = var.workload
-    WorkloadType    = var.workload_type
-    Owner           = var.owner
-    CostCenter      = var.cost_center
-    Provisioner     = "terraform"
-    Repository      = "github.com/aegisai/aegisai-platform"
+    Environment  = var.environment
+    ManagedBy    = "terraform"
+    Platform     = var.name_prefix
+    Project      = "${var.name_prefix}-platform"
+    Workload     = var.workload
+    WorkloadType = var.workload_type
+    Owner        = var.owner
+    CostCenter   = var.cost_center
+    Provisioner  = "terraform"
+    Repository   = "github.com/aegisai/aegisai-platform"
   }
 
-# ---------------------------------------------------------------------------
-# Tagging — data classification
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — data classification
+  # ---------------------------------------------------------------------------
 
   data_classification_tags = {
     DataClassification   = var.data_classification
     ComplianceFrameworks = join(",", var.compliance_frameworks)
   }
 
-# ---------------------------------------------------------------------------
-# Tagging — environment tier and lifecycle
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — environment tier and lifecycle
+  # ---------------------------------------------------------------------------
 
   lifecycle_tags = {
-    EnvironmentTier    = var.environment_tier
+    EnvironmentTier     = var.environment_tier
     ResourceCriticality = var.resource_criticality
   }
 
-# ---------------------------------------------------------------------------
-# Tagging — encryption and security posture
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — encryption and security posture
+  # ---------------------------------------------------------------------------
 
   security_tags = {
     RequiresEncryptionAtRest    = var.requires_encryption_at_rest ? "true" : "false"
@@ -66,26 +66,26 @@ locals {
     RequiresBackup              = var.requires_backup ? "true" : "false"
   }
 
-# ---------------------------------------------------------------------------
-# Tagging — cost allocation
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — cost allocation
+  # ---------------------------------------------------------------------------
 
   cost_tags = {
     CostCenter = var.cost_center
     BudgetCode = var.budget_code != "" ? var.budget_code : "bg-${var.cost_center}"
   }
 
-# ---------------------------------------------------------------------------
-# Tagging — expiration
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Tagging — expiration
+  # ---------------------------------------------------------------------------
 
   expiration_tags = var.expiration_date != "" ? {
     ExpiresOn = var.expiration_date
   } : {}
 
-# ---------------------------------------------------------------------------
-# Complete merged tag set
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Complete merged tag set
+  # ---------------------------------------------------------------------------
 
   merged_tags = merge(
     local.mandatory_tags,
@@ -97,11 +97,11 @@ locals {
     var.additional_tags
   )
 
-# ---------------------------------------------------------------------------
-# Naming convention base
-#   Pattern: {name_prefix}-{environment}-{region_code}-{workload}
-#   Example: aegisai-dev-aps1-data-api
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Naming convention base
+  #   Pattern: {name_prefix}-{environment}-{region_code}-{workload}
+  #   Example: aegisai-dev-aps1-data-api
+  # ---------------------------------------------------------------------------
 
   naming_base = join(var.naming_delimiter, compact([
     var.name_prefix,
@@ -110,47 +110,47 @@ locals {
     var.workload,
   ]))
 
-# ---------------------------------------------------------------------------
-# Naming map — common resource type patterns
-# Consumers use: local.naming_map["eks_cluster"]
-# Example output: aegisai-dev-aps1-data-api-eks-cluster
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Naming map — common resource type patterns
+  # Consumers use: local.naming_map["eks_cluster"]
+  # Example output: aegisai-dev-aps1-data-api-eks-cluster
+  # ---------------------------------------------------------------------------
 
   naming_map = {
-    base              = local.naming_base
-    delimiter         = var.naming_delimiter
-    max_length        = var.resource_name_max_length
-    vpc               = "${local.naming_base}${var.naming_delimiter}vpc"
-    subnet_public     = "${local.naming_base}${var.naming_delimiter}subnet-public"
-    subnet_private    = "${local.naming_base}${var.naming_delimiter}subnet-private"
-    subnet_data       = "${local.naming_base}${var.naming_delimiter}subnet-data"
-    nat_gateway       = "${local.naming_base}${var.naming_delimiter}ngw"
-    internet_gateway  = "${local.naming_base}${var.naming_delimiter}igw"
-    vpc_endpoint      = "${local.naming_base}${var.naming_delimiter}vpce"
-    security_group    = "${local.naming_base}${var.naming_delimiter}sg"
-    eks_cluster       = "${local.naming_base}${var.naming_delimiter}eks-cluster"
-    eks_node_group    = "${local.naming_base}${var.naming_delimiter}eks-node"
-    s3_bucket         = "${local.naming_base}${var.naming_delimiter}s3"
-    dynamodb_table    = "${local.naming_base}${var.naming_delimiter}dynamodb"
-    rds_instance      = "${local.naming_base}${var.naming_delimiter}rds"
-    elasticache       = "${local.naming_base}${var.naming_delimiter}elasticache"
-    ecr_repository    = "${local.naming_base}${var.naming_delimiter}ecr"
-    kms_key           = "${local.naming_base}${var.naming_delimiter}kms"
-    iam_role          = "${local.naming_base}${var.naming_delimiter}iam-role"
-    iam_policy        = "${local.naming_base}${var.naming_delimiter}iam-policy"
-    log_group         = "${local.naming_base}${var.naming_delimiter}logs"
-    certificate       = "${local.naming_base}${var.naming_delimiter}cert"
-    hosted_zone       = "${local.naming_base}${var.naming_delimiter}zone"
-    load_balancer     = "${local.naming_base}${var.naming_delimiter}lb"
-    queue             = "${local.naming_base}${var.naming_delimiter}queue"
-    topic             = "${local.naming_base}${var.naming_delimiter}topic"
-    function          = "${local.naming_base}${var.naming_delimiter}fn"
-    api_gateway       = "${local.naming_base}${var.naming_delimiter}api"
+    base             = local.naming_base
+    delimiter        = var.naming_delimiter
+    max_length       = var.resource_name_max_length
+    vpc              = "${local.naming_base}${var.naming_delimiter}vpc"
+    subnet_public    = "${local.naming_base}${var.naming_delimiter}subnet-public"
+    subnet_private   = "${local.naming_base}${var.naming_delimiter}subnet-private"
+    subnet_data      = "${local.naming_base}${var.naming_delimiter}subnet-data"
+    nat_gateway      = "${local.naming_base}${var.naming_delimiter}ngw"
+    internet_gateway = "${local.naming_base}${var.naming_delimiter}igw"
+    vpc_endpoint     = "${local.naming_base}${var.naming_delimiter}vpce"
+    security_group   = "${local.naming_base}${var.naming_delimiter}sg"
+    eks_cluster      = "${local.naming_base}${var.naming_delimiter}eks-cluster"
+    eks_node_group   = "${local.naming_base}${var.naming_delimiter}eks-node"
+    s3_bucket        = "${local.naming_base}${var.naming_delimiter}s3"
+    dynamodb_table   = "${local.naming_base}${var.naming_delimiter}dynamodb"
+    rds_instance     = "${local.naming_base}${var.naming_delimiter}rds"
+    elasticache      = "${local.naming_base}${var.naming_delimiter}elasticache"
+    ecr_repository   = "${local.naming_base}${var.naming_delimiter}ecr"
+    kms_key          = "${local.naming_base}${var.naming_delimiter}kms"
+    iam_role         = "${local.naming_base}${var.naming_delimiter}iam-role"
+    iam_policy       = "${local.naming_base}${var.naming_delimiter}iam-policy"
+    log_group        = "${local.naming_base}${var.naming_delimiter}logs"
+    certificate      = "${local.naming_base}${var.naming_delimiter}cert"
+    hosted_zone      = "${local.naming_base}${var.naming_delimiter}zone"
+    load_balancer    = "${local.naming_base}${var.naming_delimiter}lb"
+    queue            = "${local.naming_base}${var.naming_delimiter}queue"
+    topic            = "${local.naming_base}${var.naming_delimiter}topic"
+    function         = "${local.naming_base}${var.naming_delimiter}fn"
+    api_gateway      = "${local.naming_base}${var.naming_delimiter}api"
   }
 
-# ---------------------------------------------------------------------------
-# Compliance framework control definitions
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Compliance framework control definitions
+  # ---------------------------------------------------------------------------
 
   compliance_controls = {
     pci-dss = {
@@ -166,11 +166,11 @@ locals {
         "10.2 Automated audit log review",
       ]
       platform_coverage = {
-        NetworkSegregation       = "NetworkPolicies, Security Groups, NACLs"
-        AccessControl            = "IAM roles with permission boundaries, OPA policies"
-        Encryption               = "KMS encryption at rest, TLS 1.3 in transit"
-        AuditLogging             = "CloudTrail, Kubernetes audit logs, structured logging"
-        VulnerabilityManagement  = "Container scanning, SAST/SCA pipeline gates"
+        NetworkSegregation      = "NetworkPolicies, Security Groups, NACLs"
+        AccessControl           = "IAM roles with permission boundaries, OPA policies"
+        Encryption              = "KMS encryption at rest, TLS 1.3 in transit"
+        AuditLogging            = "CloudTrail, Kubernetes audit logs, structured logging"
+        VulnerabilityManagement = "Container scanning, SAST/SCA pipeline gates"
       }
     }
     soc2 = {
@@ -186,11 +186,11 @@ locals {
         "CC8.1 Change Management",
       ]
       platform_coverage = {
-        AccessControls     = "IAM, OIDC, RBAC, IRSA"
-        Monitoring         = "Prometheus, Grafana, structured logging, distributed tracing"
-        IncidentResponse   = "Alertmanager, PagerDuty integration, runbooks"
-        ChangeManagement   = "GitOps, PR-based changes, CI/CD gates, approval workflows"
-        Encryption         = "KMS, TLS 1.3, encryption at rest"
+        AccessControls   = "IAM, OIDC, RBAC, IRSA"
+        Monitoring       = "Prometheus, Grafana, structured logging, distributed tracing"
+        IncidentResponse = "Alertmanager, PagerDuty integration, runbooks"
+        ChangeManagement = "GitOps, PR-based changes, CI/CD gates, approval workflows"
+        Encryption       = "KMS, TLS 1.3, encryption at rest"
       }
     }
     iso27001 = {
@@ -208,12 +208,12 @@ locals {
         "A.17 Business continuity management",
       ]
       platform_coverage = {
-        AssetManagement      = "Tagging enforcement, resource inventory"
-        AccessControl        = "IAM, OIDC, RBAC, permission boundaries"
-        Cryptography         = "KMS, TLS 1.3, encryption at rest and in transit"
-        OperationsSecurity   = "CI/CD pipelines, change management, vulnerability management"
-        IncidentManagement   = "Alerting, PagerDuty, runbooks, post-incident reviews"
-        BusinessContinuity   = "Multi-AZ, backup policies, DR runbooks"
+        AssetManagement    = "Tagging enforcement, resource inventory"
+        AccessControl      = "IAM, OIDC, RBAC, permission boundaries"
+        Cryptography       = "KMS, TLS 1.3, encryption at rest and in transit"
+        OperationsSecurity = "CI/CD pipelines, change management, vulnerability management"
+        IncidentManagement = "Alerting, PagerDuty, runbooks, post-incident reviews"
+        BusinessContinuity = "Multi-AZ, backup policies, DR runbooks"
       }
     }
     rbi = {
@@ -231,18 +231,18 @@ locals {
         "BCP-1 Disaster Recovery",
       ]
       platform_coverage = {
-        DataLocalization     = "Region-restricted resources, data residency enforcement"
-        BusinessContinuity   = "Multi-region DR, automated failover, backup policies"
-        AccessControl        = "IAM, RBAC, MFA enforcement, audit logging"
-        Encryption           = "KMS with region-restricted keys, TLS 1.3"
-        AuditCompliance      = "CloudTrail, Config, automated evidence collection"
+        DataLocalization   = "Region-restricted resources, data residency enforcement"
+        BusinessContinuity = "Multi-region DR, automated failover, backup policies"
+        AccessControl      = "IAM, RBAC, MFA enforcement, audit logging"
+        Encryption         = "KMS with region-restricted keys, TLS 1.3"
+        AuditCompliance    = "CloudTrail, Config, automated evidence collection"
       }
     }
   }
 
-# ---------------------------------------------------------------------------
-# Selected compliance controls (filtered by user-specified frameworks)
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Selected compliance controls (filtered by user-specified frameworks)
+  # ---------------------------------------------------------------------------
 
   selected_frameworks = length(var.compliance_frameworks) > 0 && !contains(var.compliance_frameworks, "none") ? var.compliance_frameworks : []
 
@@ -253,9 +253,9 @@ locals {
 
   has_compliance_requirements = length(local.selected_frameworks) > 0
 
-# ---------------------------------------------------------------------------
-# Resource classification map
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Resource classification map
+  # ---------------------------------------------------------------------------
 
   resource_classification = {
     criticality_level     = var.resource_criticality
@@ -268,16 +268,16 @@ locals {
     compliance_applicable = local.has_compliance_requirements
   }
 
-# ---------------------------------------------------------------------------
-# Cost allocation metadata
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Cost allocation metadata
+  # ---------------------------------------------------------------------------
 
   cost_allocation = {
-    cost_center       = var.cost_center
-    budget_code       = var.budget_code != "" ? var.budget_code : "bg-${var.cost_center}"
-    owner             = var.owner
-    workload          = var.workload
-    environment       = var.environment
+    cost_center        = var.cost_center
+    budget_code        = var.budget_code != "" ? var.budget_code : "bg-${var.cost_center}"
+    owner              = var.owner
+    workload           = var.workload
+    environment        = var.environment
     chargeback_enabled = var.cost_center != "" ? true : false
     allocation_tags = {
       CostCenter = var.cost_center
@@ -287,9 +287,9 @@ locals {
     }
   }
 
-# ---------------------------------------------------------------------------
-# AWS Organizations integration points (future)
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # AWS Organizations integration points (future)
+  # ---------------------------------------------------------------------------
 
   organizations_config = {
     enabled                    = false
@@ -302,9 +302,9 @@ locals {
     scp_attachments            = []
   }
 
-# ---------------------------------------------------------------------------
-# SCP templates (future — for AWS Organizations)
-# ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # SCP templates (future — for AWS Organizations)
+  # ---------------------------------------------------------------------------
 
   scp_templates = {
     restrict_iam_privilege_escalation = {

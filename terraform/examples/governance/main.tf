@@ -33,14 +33,14 @@ provider "aws" {
 module "governance" {
   source = "../../modules/governance"
 
-  environment     = var.environment
-  workload        = var.workload
-  workload_type   = var.workload_type
-  owner           = var.owner
-  cost_center     = var.cost_center
-  budget_code     = var.budget_code
-  aws_region      = var.aws_region
-  name_prefix     = var.name_prefix
+  environment   = var.environment
+  workload      = var.workload
+  workload_type = var.workload_type
+  owner         = var.owner
+  cost_center   = var.cost_center
+  budget_code   = var.budget_code
+  aws_region    = var.aws_region
+  name_prefix   = var.name_prefix
 
   data_classification   = var.data_classification
   compliance_frameworks = var.compliance_frameworks

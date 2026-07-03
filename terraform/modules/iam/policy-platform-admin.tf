@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "platform_admin" {
     effect = "Allow"
     actions = [
       "elasticloadbalancing:*",
-      "ec2:*",  # Covers VPC, subnets, security groups, etc.
+      "ec2:*", # Covers VPC, subnets, security groups, etc.
     ]
     resources = ["*"]
   }

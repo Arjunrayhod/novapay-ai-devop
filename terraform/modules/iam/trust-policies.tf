@@ -114,11 +114,11 @@ data "aws_iam_policy_document" "trust_cross_account" {
     effect = "Allow"
 
     principals {
-      type        = "AWS"
+      type = "AWS"
       identifiers = length(var.cross_account_source_role_names) > 0 ? [
         for role in var.cross_account_source_role_names :
         "arn:aws:iam::${var.cross_account_source_accounts[0]}:role/${role}"
-      ] : [
+        ] : [
         for account in var.cross_account_source_accounts :
         "arn:aws:iam::${account}:root"
       ]

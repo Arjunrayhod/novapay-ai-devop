@@ -25,26 +25,26 @@ module "network" {
   vpc_cidr           = "10.100.0.0/16"
   availability_zones = ["ap-south-1a", "ap-south-1b"]
 
-  public_subnet_cidrs      = ["10.100.1.0/24", "10.100.2.0/24"]
-  private_app_subnet_cidrs = ["10.100.11.0/24", "10.100.12.0/24"]
+  public_subnet_cidrs       = ["10.100.1.0/24", "10.100.2.0/24"]
+  private_app_subnet_cidrs  = ["10.100.11.0/24", "10.100.12.0/24"]
   private_data_subnet_cidrs = ["10.100.21.0/24", "10.100.22.0/24"]
-  isolated_subnet_cidrs    = []
+  isolated_subnet_cidrs     = []
 
-  enable_igw               = true
-  enable_nat_gateway       = true
-  nat_gateway_strategy     = "single"
+  enable_igw           = true
+  enable_nat_gateway   = true
+  nat_gateway_strategy = "single"
 
-  enable_dns_support       = true
-  enable_dns_hostnames     = true
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
-  enable_flow_logs              = true
-  flow_logs_destination         = "cloudwatch"
-  flow_logs_retention_in_days   = 90
-  flow_logs_traffic_type        = "ALL"
+  enable_flow_logs            = true
+  flow_logs_destination       = "cloudwatch"
+  flow_logs_retention_in_days = 90
+  flow_logs_traffic_type      = "ALL"
 
-  enable_s3_gateway_endpoint      = true
+  enable_s3_gateway_endpoint       = true
   enable_dynamodb_gateway_endpoint = false
-  enable_interface_endpoints      = ["ssm", "ec2", "logs"]
+  enable_interface_endpoints       = ["ssm", "ec2", "logs"]
 
   enable_default_security_groups = true
 }

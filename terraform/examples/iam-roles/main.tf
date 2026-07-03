@@ -5,12 +5,12 @@ module "iam" {
   name_prefix = "aegisai"
 
   # Enable all roles
-  create_platform_admin_role       = true
-  create_platform_operator_role    = true
-  create_cicd_role                 = true
-  create_readonly_role             = true
-  create_terraform_execution_role  = true
-  create_cross_account_role        = false
+  create_platform_admin_role      = true
+  create_platform_operator_role   = true
+  create_cicd_role                = true
+  create_readonly_role            = true
+  create_terraform_execution_role = true
+  create_cross_account_role       = false
 
   # Session durations
   platform_admin_session_duration      = 28800
@@ -29,8 +29,8 @@ module "iam" {
 
   # Permission boundary
   create_permission_boundary = true
-  allowed_iam_role_paths    = ["/platform/", "/workloads/", "/terraform/"]
-  allowed_pass_role_paths   = ["/platform/", "/workloads/", "/terraform/"]
+  allowed_iam_role_paths     = ["/platform/", "/workloads/", "/terraform/"]
+  allowed_pass_role_paths    = ["/platform/", "/workloads/", "/terraform/"]
 
   tags = {
     Environment = "dev"
