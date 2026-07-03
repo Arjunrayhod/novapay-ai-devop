@@ -1,15 +1,19 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
+
 metadata:
   name: aegisai-io2
   labels:
-    aegisai.io/storage-tier: high-performance
+    aegisai.io/storage-tier: 'high-performance'
+
 provisioner: ebs.csi.aws.com
+
 parameters:
-  type: io2
-  iops: "40000"
-  throughput: "1000"
-  encrypted: "true"
+  type: 'io2'
+  iops: '40000'
+  throughput: '1000'
+  encrypted: 'true'
+
 reclaimPolicy: Delete
 volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
