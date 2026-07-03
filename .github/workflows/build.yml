@@ -27,7 +27,7 @@ jobs:
       meta_version: ${{ steps.meta.outputs.version }}
       meta_tags: ${{ steps.meta.outputs.tags }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set build metadata
         id: meta

@@ -39,7 +39,7 @@ jobs:
         mode: [check, format]
       fail-fast: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -61,7 +61,7 @@ jobs:
     timeout-minutes: 10
     needs: [ruff]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
