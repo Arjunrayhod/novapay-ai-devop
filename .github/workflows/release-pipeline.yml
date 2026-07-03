@@ -1,10 +1,6 @@
 name: Release Pipeline
 
 on:
-  workflow_run:
-    workflows: ['Build']
-    types:
-      - completed
   workflow_dispatch:
     inputs:
       dry-run:
@@ -22,7 +18,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: false
 
 defaults:
@@ -49,13 +45,9 @@ jobs:
       - name: Resolve tag
         id: resolve
         run: |
-          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
-            TAG='${{ github.event.inputs.tag }}'
-            if [[ -z "$TAG" ]]; then
-              TAG='v0.0.0-dryrun'
-            fi
-          else
-            TAG='${{ github.event.workflow_run.head_branch }}'
+          TAG='${{ github.event.inputs.tag }}'
+          if [[ -z "$TAG" ]]; then
+            TAG='v0.0.0-dryrun'
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
