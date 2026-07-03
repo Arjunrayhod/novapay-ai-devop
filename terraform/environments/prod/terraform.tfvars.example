@@ -1,0 +1,17 @@
+aws_region            = "ap-south-1"
+owner                 = "platform-engineering"
+cost_center           = "cc-prod"
+vpc_cidr              = "10.0.0.0/16"
+availability_zones    = ["ap-south-1a", "ap-south-1b", "ap-south-1c"]
+cluster_version       = "1.30"
+node_group_desired_size = 5
+node_group_min_size   = 3
+node_group_max_size   = 12
+node_instance_types   = ["t3.xlarge", "m5.xlarge"]
+
+tags = {
+  EnvironmentType = "production"
+  Criticality     = "tier-1"
+  DataClassification = "restricted"
+  ComplianceScope = "pci-dss,soc2"
+}

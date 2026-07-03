@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: tempo
+  annotations:
+    aegisai.io/component: tempo
+
+namespace: aegisai-observability
+
+resources:
+  - deployment.yaml
+  - service.yaml
+  - config.yaml
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: tempo
+      aegisai.io/tier: observability

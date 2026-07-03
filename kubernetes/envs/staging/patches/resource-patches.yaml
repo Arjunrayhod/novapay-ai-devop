@@ -1,0 +1,20 @@
+# Staging resource patches — moderate resource allocation.
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: patch-staging-resources
+  annotations:
+    aegisai.io/patch: staging-resources
+spec:
+  template:
+    spec:
+      containers:
+        - name: "*"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi

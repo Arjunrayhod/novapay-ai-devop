@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-default
+  labels:
+    app.kubernetes.io/name: grafana
+data:
+  cluster-overview.json: |
+    {
+      "__inputs": [],
+      "__requires": [],
+      "title": "AegisAI Cluster Overview",
+      "uid": "aegisai-cluster-overview",
+      "schemaVersion": 36,
+      "version": 1,
+      "panels": [],
+      "tags": ["aegisai", "kubernetes"],
+      "timezone": "browser"
+    }
+  platform-overview.json: |
+    {
+      "__inputs": [],
+      "__requires": [],
+      "title": "AegisAI Platform Overview",
+      "uid": "aegisai-platform-overview",
+      "schemaVersion": 36,
+      "version": 1,
+      "panels": [],
+      "tags": ["aegisai", "platform"],
+      "timezone": "browser"
+    }

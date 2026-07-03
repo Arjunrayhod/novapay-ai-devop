@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incident-response-runbook
+  labels:
+    aegisai.io/component: runbook
+    aegisai.io/runbook-type: incident-response
+data:
+  title: "Incident Response Runbook"
+  version: "1.0.0"
+  severity-levels: |
+    SEV1: Critical - Complete service outage or data loss
+    SEV2: High - Major feature degradation affecting many users
+    SEV3: Medium - Partial degradation or non-critical feature outage
+    SEV4: Low - Minor issues, cosmetic defects
+  incident-response-steps: |
+    1. DETECT: Identify via monitoring alerts, user reports, or automated checks
+       - Check ArgoCD dashboard: Applications > Health status
+       - Check Prometheus: Alerts > Firing
+       - Check PagerDuty/OpsGenie for critical notifications
+       - Verify Slack #incidents channel for reports
+
+    2. TRIAGE: Assess impact and severity
+       - Determine affected services and user population
+       - Check recent deployments in ArgoCD (last 1 hour)
+       - Review application logs: kubectl logs -n <namespace> <pod>
+       - Check resource utilization: kubectl top pods -n <namespace>
+
+    3. RESPOND: Take immediate action
+       - For SEV1/SEV2: Initiate incident bridge via Slack /incident
+       - For SEV3/SEV4: File a bug and assign to on-call engineer
+       - If caused by bad deployment: Initiate rollback per rollback procedure
+       - If infrastructure issue: Escalate to platform team
+
+    4. MITIGATE: Apply fix or rollback
+       - Rollback via ArgoCD UI: App > Sync > Sync Revision (previous)
+       - Rollback via CLI: argocd app rollback <app-name> <revision>
+       - Rollback via Rollout: kubectl argo rollouts undo <rollout-name>
+       - Apply hotfix if safe and necessary
+
+    5. RESOLVE: Confirm service restoration
+       - Verify health endpoints: curl -f http://service/health
+       - Check metrics return to baseline
+       - Confirm alert resolution in monitoring
+
+    6. POSTMORTEM: Document and learn
+       - Create incident timeline
+       - Identify root cause
+       - Define preventive actions
+       - Schedule follow-up improvements
+
+  escalation-contacts: |
+    Primary On-Call: <oncall-engineer> (Slack: @oncall)
+    Secondary On-Call: <senior-engineer> (Slack: @senior-oncall)
+    Platform Team: <platform-team> (Slack: #platform-eng)
+    Security Team: <security-team> (Slack: #security) (For security incidents)
+  communication-templates:
+    incident-communication: |
+      :rotating_light: INCIDENT DETECTED
+      Service: <SERVICE_NAME>
+      Severity: <SEV>
+      Impact: <DESCRIPTION_OF_IMPACT>
+      Reported by: <SOURCE>
+      Action: <TAKEN_ACTION>
+      Channel: #incidents
+    resolution-communication: |
+      :white_check_mark: INCIDENT RESOLVED
+      Service: <SERVICE_NAME>
+      Duration: <DURATION>
+      Root Cause: <ROOT_CAUSE>
+      Action Taken: <ACTION_TAKEN>

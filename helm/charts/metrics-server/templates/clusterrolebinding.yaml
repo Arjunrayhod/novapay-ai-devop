@@ -1,0 +1,33 @@
+{{- $appName := (index .Values "aegisai-common").nameOverride }}
+{{- $svcAcct := (index .Values "aegisai-common").serviceAccount.name }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ $appName }}
+  labels:
+    helm.sh/chart: {{ printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+    app.kubernetes.io/name: {{ $appName }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/component: {{ .Values.component }}
+    app.kubernetes.io/part-of: {{ .Values.partOf }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    aegisai.io/environment: {{ .Values.global.environment }}
+    aegisai.io/tier: {{ .Values.global.tier }}
+    aegisai.io/data-classification: {{ .Values.global.dataClassification }}
+    aegisai.io/owner: {{ .Values.global.owner }}
+    aegisai.io/cost-center: {{ .Values.global.costCenter }}
+  annotations:
+    aegisai.io/environment: {{ .Values.global.environment }}
+    aegisai.io/owner: {{ .Values.global.owner }}
+    aegisai.io/cost-center: {{ .Values.global.costCenter }}
+    aegisai.io/data-classification: {{ .Values.global.dataClassification }}
+    aegisai.io/compliance-frameworks: pci-dss,soc2,rbi
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ $appName }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ $svcAcct }}
+    namespace: {{ .Release.Namespace }}

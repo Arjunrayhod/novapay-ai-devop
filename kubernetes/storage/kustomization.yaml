@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-storage
+
+resources:
+  - storage-classes/gp3.yaml
+  - storage-classes/gp3-retain.yaml
+  - storage-classes/io2.yaml
+  - storage-classes/efs.yaml

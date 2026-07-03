@@ -1,0 +1,164 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-notifications-cm
+  labels:
+    app.kubernetes.io/name: argocd-notifications-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  context: |
+    slackEnabled: true
+    emailEnabled: true
+    environment: production
+  template.deployment-started: |
+    webhook:
+      slack:
+        method: POST
+        path: /services/webhook-url
+        body: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "🚀 Deployment Started: {{.app.status.sync.revision | substring 0 7}}"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {"type": "mrkdwn", "text": "*Application:* {{.app.metadata.name}}"},
+                  {"type": "mrkdwn", "text": "*Environment:* {{.destination.namespace}}"},
+                  {"type": "mrkdwn", "text": "*Revision:* {{.app.status.sync.revision | substring 0 7}}"},
+                  {"type": "mrkdwn", "text": "*Timestamp:* {{.app.status.operationState.startedAt}}"}
+                ]
+              }
+            ]
+          }
+    email:
+      subject: "[ArgoCD] Deployment Started - {{.app.metadata.name}}"
+      body: |
+        Application: {{.app.metadata.name}}
+        Environment: {{.destination.namespace}}
+        Revision: {{.app.status.sync.revision | substring 0 7}}
+        Status: Sync started
+  template.deployment-succeeded: |
+    webhook:
+      slack:
+        method: POST
+        path: /services/webhook-url
+        body: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "✅ Deployment Succeeded: {{.app.metadata.name}}"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {"type": "mrkdwn", "text": "*Application:* {{.app.metadata.name}}"},
+                  {"type": "mrkdwn", "text": "*Environment:* {{.destination.namespace}}"},
+                  {"type": "mrkdwn", "text": "*Revision:* {{.app.status.sync.revision | substring 0 7}}"},
+                  {"type": "mrkdwn", "text": "*Duration:* {{.app.status.operationState.duration}}"}
+                ]
+              }
+            ]
+          }
+    email:
+      subject: "[ArgoCD] Deployment Succeeded - {{.app.metadata.name}}"
+      body: |
+        Application: {{.app.metadata.name}}
+        Environment: {{.destination.namespace}}
+        Revision: {{.app.status.sync.revision | substring 0 7}}
+        Status: Synced and healthy
+  template.deployment-failed: |
+    webhook:
+      slack:
+        method: POST
+        path: /services/webhook-url
+        body: |
+          {
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "❌ Deployment Failed: {{.app.metadata.name}}"
+                }
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {"type": "mrkdwn", "text": "*Application:* {{.app.metadata.name}}"},
+                  {"type": "mrkdwn", "text": "*Environment:* {{.destination.namespace}}"},
+                  {"type": "mrkdwn", "text": "*Revision:* {{.app.status.sync.revision | substring 0 7}}"},
+                  {"type": "mrkdwn", "text": "*Reason:* {{.app.status.operationState.message}}"}
+                ]
+              }
+            ]
+          }
+    email:
+      subject: "[ArgoCD] Deployment Failed - {{.app.metadata.name}}"
+      body: |
+        Application: {{.app.metadata.name}}
+        Environment: {{.destination.namespace}}
+        Revision: {{.app.status.sync.revision | substring 0 7}}
+        Error: {{.app.status.operationState.message}}
+        Action Required: Immediate investigation needed.
+  template.rollout-step-completed: |
+    webhook:
+      slack:
+        method: POST
+        path: /services/webhook-url
+        body: |
+          {
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "🔄 Rollout Step Completed: {{.app.metadata.name}} - Step {{.step}} ready for promotion"
+                }
+              }
+            ]
+          }
+  trigger.on-sync-running: |
+    - description: "Application sync started"
+      oncePer: sync
+      send:
+        - deployment-started
+  trigger.on-sync-succeeded: |
+    - description: "Application sync succeeded"
+      oncePer: sync
+      send:
+        - deployment-succeeded
+  trigger.on-sync-failed: |
+    - description: "Application sync failed"
+      oncePer: sync
+      send:
+        - deployment-failed
+  trigger.on-health-degraded: |
+    - description: "Application health degraded"
+      oncePer: sync
+      send:
+        - deployment-failed
+  trigger.on-rollout-step-completed: |
+    - description: "Rollout step completed"
+      send:
+        - rollout-step-completed
+  service.webhook.slack: |
+    url: https://hooks.slack.com/services/CHANGE/ME
+    headers:
+      - name: Content-Type
+        value: application/json
+  service.email: |
+    host: CHANGE_ME
+    port: 587
+    from: CHANGE_ME
+    username: CHANGE_ME
+    encryption: tls

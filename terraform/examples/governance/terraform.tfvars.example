@@ -1,0 +1,25 @@
+# ---------------------------------------------------------------------------
+# Governance Module — Example Terraform Variables
+# Copy to terraform.tfvars and customize for your workload
+# ---------------------------------------------------------------------------
+
+environment         = "dev"
+aws_region          = "ap-south-1"
+name_prefix         = "aegisai"
+workload            = "example-service"
+workload_type       = "platform-service"
+owner               = "platform-engineering"
+cost_center         = "cc-platform"
+budget_code         = ""
+data_classification = "internal"
+compliance_frameworks = ["soc2", "pci-dss"]
+resource_criticality  = "medium"
+requires_encryption_at_rest    = true
+requires_encryption_in_transit = true
+requires_backup                = true
+environment_tier    = "development"
+expiration_date     = ""
+
+additional_tags = {
+  Demo = "governance-example"
+}

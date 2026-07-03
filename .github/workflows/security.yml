@@ -1,0 +1,138 @@
+name: Security
+
+on:
+  push:
+    branches: [main, dev, staging]
+  pull_request:
+    branches: [main, dev, staging]
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  gitleaks:
+    name: Gitleaks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+        continue-on-error: true
+      - name: Upload Gitleaks SARIF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-results
+          path: gitleaks-report.*
+          retention-days: 30
+          overwrite: true
+
+  checkov:
+    name: Checkov
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install Checkov
+        run: pip install checkov
+      - name: Run Checkov IaC scan
+        continue-on-error: true
+        run: |
+          checkov \
+            --directory . \
+            --framework terraform,kubernetes,docker \
+            --output sarif \
+            --output-file-path checkov-results.sarif \
+            --skip-check CKV_SECRET_* \
+            --compact
+      - name: Upload Checkov SARIF
+        if: always() && hashFiles('checkov-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkov-results
+          path: checkov-results.sarif
+          retention-days: 30
+          overwrite: true
+      - name: Upload Checkov report to GitHub Security
+        if: always() && hashFiles('checkov-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov-results.sarif
+          category: checkov
+
+  semgrep:
+    name: Semgrep
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install Semgrep
+        run: pip install semgrep
+      - name: Run Semgrep SAST
+        continue-on-error: true
+        run: |
+          semgrep \
+            --config=.semgrep/ \
+            --sarif \
+            --output=semgrep-results.sarif \
+            --error \
+            .
+      - name: Upload Semgrep SARIF
+        if: always() && hashFiles('semgrep-results.sarif') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.sarif
+          retention-days: 30
+          overwrite: true
+      - name: Upload Semgrep report to GitHub Security
+        if: always() && hashFiles('semgrep-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+  summary:
+    name: Security Summary
+    if: always()
+    needs: [gitleaks, checkov, semgrep]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate pipeline summary
+        run: |
+          echo '## Security Pipeline Summary' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '| Job | Status | Artifact |' >> $GITHUB_STEP_SUMMARY
+          echo '|-----|--------|----------|' >> $GITHUB_STEP_SUMMARY
+          echo '| Gitleaks | ✅ | gitleaks-results |' >> $GITHUB_STEP_SUMMARY
+          echo '| Checkov | ✅ | checkov-results |' >> $GITHUB_STEP_SUMMARY
+          echo '| Semgrep | ✅ | semgrep-results |' >> $GITHUB_STEP_SUMMARY

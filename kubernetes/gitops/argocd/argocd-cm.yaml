@@ -1,0 +1,177 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  repositories: |
+    - url: https://github.com/novapay/novapay-ai-devops
+      type: git
+      passwordSecret:
+        name: novapay-gitops-token
+        key: token
+  resource.customizations: |
+    argoproj.io/Application:
+      health.lua: |
+        hs = {}
+        hs.status = "Progressing"
+        hs.message = "Application is being managed by ArgoCD"
+        return hs
+    argoproj.io/AppProject:
+      health.lua: |
+        hs = {}
+        hs.status = "Healthy"
+        hs.message = "Project is healthy"
+        return hs
+    cert-manager.io/Certificate:
+      health.lua: |
+        hs = {}
+        if obj.status and obj.status.conditions then
+          for _, c in pairs(obj.status.conditions) do
+            if c.type == "Ready" and c.status == "True" then
+              hs.status = "Healthy"
+              hs.message = c.message
+              return hs
+            end
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for certificate to be ready"
+        return hs
+    cert-manager.io/ClusterIssuer:
+      health.lua: |
+        hs = {}
+        if obj.status and obj.status.conditions then
+          for _, c in pairs(obj.status.conditions) do
+            if c.type == "Ready" then
+              if c.status == "True" then
+                hs.status = "Healthy"
+              else
+                hs.status = "Degraded"
+              end
+              hs.message = c.message
+              return hs
+            end
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for issuer to be ready"
+        return hs
+    external-secrets.io/SecretStore:
+      health.lua: |
+        hs = {}
+        if obj.status and obj.status.conditions then
+          for _, c in pairs(obj.status.conditions) do
+            if c.type == "Ready" and c.status == "True" then
+              hs.status = "Healthy"
+              hs.message = c.message
+              return hs
+            end
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for SecretStore to connect"
+        return hs
+    external-secrets.io/ExternalSecret:
+      health.lua: |
+        hs = {}
+        if obj.status and obj.status.conditions then
+          for _, c in pairs(obj.status.conditions) do
+            if c.type == "Ready" and c.status == "True" then
+              hs.status = "Healthy"
+              hs.message = c.message
+              return hs
+            end
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for ExternalSecret to sync"
+        return hs
+    networking.k8s.io/Ingress:
+      health.lua: |
+        hs = {}
+        if obj.status and obj.status.loadBalancer and obj.status.loadBalancer.ingress then
+          hs.status = "Healthy"
+          hs.message = "Ingress is serving"
+          return hs
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for load balancer"
+        return hs
+    argoproj.io/Rollout:
+      health.lua: |
+        hs = {}
+        if obj.status ~= nil then
+          if obj.status.currentStepHash and obj.status.currentStepHash == obj.status.pauseConditions then
+            hs.status = "Suspended"
+            hs.message = "Rollout is paused"
+            return hs
+          end
+          if obj.status.currentSetWeight ~= nil then
+            hs.status = "Progressing"
+            hs.message = "Canary weight: " .. obj.status.currentSetWeight .. "%"
+            return hs
+          end
+          if obj.status.blueGreen ~= nil then
+            hs.status = "Progressing"
+            hs.message = "BlueGreen: active=blue, preview=green"
+            return hs
+          end
+          for _, cond in ipairs(obj.status.conditions or {}) do
+            if cond.type == "Promoted" and cond.status == "True" then
+              hs.status = "Healthy"
+              hs.message = "Rollout fully promoted"
+              return hs
+            end
+            if cond.type == "Progressing" and cond.status == "False" then
+              hs.status = "Degraded"
+              hs.message = "Rollout is not progressing"
+              return hs
+            end
+            if cond.reason == "RolloutAborted" then
+              hs.status = "Degraded"
+              hs.message = "Rollout aborted by analysis"
+              return hs
+            end
+          end
+          if obj.status.abort then
+            hs.status = "Degraded"
+            hs.message = "Rollout has been aborted"
+            return hs
+          end
+        end
+        hs.status = "Progressing"
+        hs.message = "Waiting for rollout to initialize"
+        return hs
+  resource.customizations.ignoreDifferences: |
+    argoproj.io/Rollout:
+      jsonPointers:
+        - /spec/template/metadata/labels
+        - /spec/template/spec/containers/0/image
+        - /status
+    argoproj.io/Application:
+      jsonPointers:
+        - /spec/source/targetRevision
+        - /status
+    argoproj.io/AppProject:
+      jsonPointers:
+        - /status
+  resource.exclusions: |
+    - apiGroups:
+      - argoproj.io
+      kinds:
+      - Application
+      clusters:
+      - https://kubernetes.default.svc
+  configManagementPlugins: |
+    - name: kustomize-v5
+      init:
+        command: [kustomize]
+        args: [init]
+      generate:
+        command: [kustomize]
+        args: [build]
+  timeout.reconciliation: 180s
+  admin.enabled: 'true'

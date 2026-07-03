@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-config
+  namespace: aegisai-observability
+  labels:
+    app.kubernetes.io/name: grafana
+data:
+  grafana.ini: |
+    [server]
+    root_url = https://grafana.novapay.io
+    serve_from_sub_path = false
+    http_port = 3000
+    protocol = http
+    enable_gzip = true
+
+    [security]
+    admin_user = admin
+    secret_key = changeme
+
+    [auth]
+    disable_login_form = false
+    oauth_auto_login = false
+    sigv4_auth_enabled = false
+
+    [auth.anonymous]
+    enabled = false
+
+    [users]
+    allow_sign_up = false
+    auto_assign_org = true
+    auto_assign_org_role = Viewer
+    default_theme = dark
+
+    [unified_alerting]
+    enabled = true
+
+    [metrics]
+    enabled = true
+    interval_seconds = 15
+
+    [log]
+    mode = console
+    level = info
+
+    [analytics]
+    reporting_enabled = false
+    check_for_updates = false
+
+    [explore]
+    enabled = true
+
+    [panels]
+    disable_sanitize_html = false
+
+    [plugins]
+    enable_alpha = false
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-config
+  namespace: aegisai-observability
+  labels:
+    app.kubernetes.io/name: grafana
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: default
+        orgId: 1
+        folder: ""
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/provisioning/dashboards/default
+      - name: base-dashboards
+        orgId: 1
+        folder: Base
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /etc/grafana/provisioning/dashboards/base

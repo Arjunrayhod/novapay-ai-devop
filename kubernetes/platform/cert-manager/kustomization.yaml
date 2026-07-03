@@ -1,0 +1,26 @@
+# cert-manager AegisAI Platform Component
+# https://cert-manager.io/docs/
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-cert-manager
+
+commonLabels:
+  aegisai.io/component: cert-manager
+  app.kubernetes.io/name: cert-manager
+  app.kubernetes.io/part-of: aegisai
+
+# cert-manager is installed via Helm.
+# Generate manifests with:
+#   helm repo add jetstack https://charts.jetstack.io
+#   helm template cert-manager jetstack/cert-manager \
+#     --namespace aegisai-platform-cert-manager \
+#     --set installCRDs=true \
+#     -f values.yaml > generated.yaml
+
+resources:
+  # - generated.yaml
+  - namespace.yaml
+  - cluster-issuer.yaml

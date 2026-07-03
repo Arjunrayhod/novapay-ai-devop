@@ -1,0 +1,16 @@
+# cert-manager Helm values for AegisAI platform.
+
+installCRDs: true
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA for Route53
+
+podSecurityPolicy:
+  enabled: false
+
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+    namespace: aegisai-platform-cert-manager

@@ -1,0 +1,43 @@
+# Pod Security Admission label reference for AegisAI namespaces.
+# Apply these labels to Namespace objects to enforce PSA levels.
+#
+# Reference: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aegisai-psa-labels
+  annotations:
+    aegisai.io/description: "Pod Security Admission label reference"
+data:
+  # Privileged (system components, Istio)
+  privileged: |
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+
+  # Baseline (team, shared, addon workloads)
+  baseline: |
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+
+  # Restricted (future: user workloads)
+  restricted: |
+    pod-security.kubernetes.io/enforce: restricted
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
+---
+# Example: how to label a namespace for PSA
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-example-baseline
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline

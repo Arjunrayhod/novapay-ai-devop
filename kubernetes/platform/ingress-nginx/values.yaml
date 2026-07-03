@@ -1,0 +1,27 @@
+# ingress-nginx Helm values for AegisAI platform.
+# Used with: helm template ingress-nginx ingress-nginx/ingress-nginx -f values.yaml
+# Generated manifests placed in generated.yaml for Kustomize.
+
+controller:
+  ingressClassResource:
+    name: aegisai-nginx
+    enabled: true
+    default: true
+    controllerValue: k8s.io/ingress-nginx
+
+  service:
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "external"
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+      service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: aegisai-platform-ingress-nginx
+
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault

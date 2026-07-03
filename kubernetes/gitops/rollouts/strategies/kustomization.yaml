@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: argo-rollouts-strategies
+  annotations:
+    aegisai.io/component: argo-rollouts
+
+resources:
+  - canary.yaml
+  - blue-green.yaml

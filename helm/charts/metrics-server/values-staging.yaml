@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+# Staging environment overrides
+# ---------------------------------------------------------------------------
+global:
+  environment: staging
+
+aegisai-common:
+  global:
+    environment: staging
+  deployment:
+    replicas: 2
+    resources:
+      requests:
+        cpu: 100m
+        memory: 200Mi
+      limits:
+        cpu: 200m
+        memory: 300Mi
+    args:
+      - --kubelet-preferred-address-types=InternalIP
+      - --cert-dir=/tmp/certs
+      - --metric-resolution=15s

@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  name: aegisai-nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+  labels:
+    aegisai.io/ingress-type: public
+spec:
+  controller: k8s.io/ingress-nginx
+---
+apiVersion: elbv2.k8s.aws/v1beta1
+kind: IngressClassParams
+metadata:
+  name: aegisai-nginx-public
+  labels:
+    aegisai.io/ingress-type: public
+spec:
+  group:
+    name: aegisai
+  loadBalancerAttributes:
+    - key: deletion_protection.enabled
+      value: "true"
+    - key: idle_timeout.timeout_seconds
+      value: "60"
+  tags:
+    - key: aegisai.io/component
+      value: ingress
+    - key: aegisai.io/ingress-type
+      value: public
+  # subnets populated from Terraform public_subnet_ids output

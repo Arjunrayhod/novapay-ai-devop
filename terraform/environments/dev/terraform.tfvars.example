@@ -1,0 +1,16 @@
+aws_region            = "ap-south-1"
+owner                 = "platform-engineering"
+cost_center           = "cc-dev"
+vpc_cidr              = "10.100.0.0/16"
+availability_zones    = ["ap-south-1a", "ap-south-1b", "ap-south-1c"]
+cluster_version       = "1.30"
+node_group_desired_size = 2
+node_group_min_size   = 1
+node_group_max_size   = 4
+node_instance_types   = ["t3.medium", "t3.large"]
+
+tags = {
+  EnvironmentType = "development"
+  Criticality     = "tier-3"
+  DataClassification = "internal"
+}

@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ printf "%s-test-connection" (include "aegisai-common.fullname" .) }}
+  namespace: {{ include "aegisai-common.namespace" . }}
+  labels:
+    {{- include "aegisai-common.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+    {{- include "aegisai-common.annotations" . | nindent 4 }}
+spec:
+  containers:
+    - name: test-connection
+      image: curlimages/curl:latest
+      command:
+        - /bin/sh
+        - -c
+        - |
+          set -e
+          echo "Testing connectivity to {{ include "aegisai-common.fullname" . }}"
+          curl -sf \
+            --max-time 5 \
+            http://{{ include "aegisai-common.fullname" . }}:{{ (index .Values.service.ports 0).port }}/healthz || \
+            echo "Health check endpoint not available — please verify application exposes /healthz"
+  restartPolicy: Never

@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: environment-base
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: environment-base
+    app.kubernetes.io/part-of: argocd
+    aegisai.io/environment: base
+  annotations:
+    argocd.argoproj.io/sync-wave: '0'
+spec:
+  description: Base environment project with shared configurations
+  sourceRepos:
+    - '*'
+  destinations:
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  syncWindows:
+    - kind: allow
+      schedule: '0 0 * * *'
+      duration: 168h
+      applications:
+        - '*'
+  orphanedResources:
+    warn: true

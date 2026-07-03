@@ -1,0 +1,9 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: aegisai-application-normal
+  labels:
+    aegisai.io/priority-tier: application
+value: 0
+globalDefault: true
+description: "Default priority for standard application workloads. Matches the Kubernetes default priority. Preempted by platform, security, observability, and application-high workloads."

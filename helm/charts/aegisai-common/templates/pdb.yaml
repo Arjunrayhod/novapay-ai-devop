@@ -1,0 +1,21 @@
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "aegisai-common.fullname" . }}
+  namespace: {{ include "aegisai-common.namespace" . }}
+  labels:
+    {{- include "aegisai-common.labels" . | nindent 4 }}
+  annotations:
+    {{- include "aegisai-common.annotations" . | nindent 4 }}
+spec:
+  {{- if .Values.pdb.minAvailable }}
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  {{- end }}
+  {{- if .Values.pdb.maxUnavailable }}
+  maxUnavailable: {{ .Values.pdb.maxUnavailable }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aegisai-common.selectorLabels" . | nindent 6 }}
+{{- end }}

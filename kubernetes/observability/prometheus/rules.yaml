@@ -1,0 +1,150 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: base-alerting-rules
+  namespace: aegisai-observability
+  labels:
+    aegisai.io/rule: prometheus
+    app.kubernetes.io/name: base-alerting-rules
+spec:
+  groups:
+    - name: kubernetes-infra
+      interval: 30s
+      rules:
+        - alert: KubeNodeNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node {{ $labels.node }} is not ready"
+            description: "Node {{ $labels.node }} has been not ready for more than 5 minutes"
+        - alert: KubeNodeUnreachable
+          expr: kube_node_spec_taint{key="node.kubernetes.io/unreachable"} == 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node {{ $labels.node }} is unreachable"
+            description: "Node {{ $labels.node }} has been unreachable for more than 5 minutes"
+        - alert: KubeletDown
+          expr: up{job="kubelet"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Kubelet on {{ $labels.node }} is down"
+            description: "Kubelet on {{ $labels.node }} has not been reachable for 5 minutes"
+        - alert: KubeAPIDown
+          expr: up{job="kube-apiserver"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Kubernetes API server is down"
+            description: "Kubernetes API server has not been reachable for 5 minutes"
+        - alert: KubeCPUThrottlingHigh
+          expr: sum(rate(container_cpu_cfs_throttled_seconds_total{container!=""}[5m])) by (namespace, pod, container) / sum(rate(container_cpu_cfs_periods_total{container!=""}[5m])) by (namespace, pod, container) > 0.25
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "CPU throttling high in {{ $labels.container }}"
+            description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is experiencing CPU throttling > 25% for 15 minutes"
+    - name: kubernetes-pods
+      interval: 30s
+      rules:
+        - alert: KubePodCrashLooping
+          expr: rate(kube_pod_container_status_restarts_total[10m]) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ $labels.pod }} is crash looping"
+            description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping (>1 restart per 10m)"
+        - alert: KubePodNotReady
+          expr: kube_pod_status_phase{phase=~"Pending|Unknown|Failed"} > 0
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod {{ $labels.pod }} is not ready"
+            description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been not ready for 5 minutes"
+        - alert: KubeDeploymentReplicasMismatch
+          expr: kube_deployment_spec_replicas{job="kube-state-metrics"} != kube_deployment_status_replicas_available{job="kube-state-metrics"}
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Deployment {{ $labels.deployment }} replica mismatch"
+            description: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has {{ $value }} unavailable replicas"
+        - alert: KubeStatefulSetReplicasMismatch
+          expr: kube_statefulset_spec_replicas{job="kube-state-metrics"} != kube_statefulset_status_replicas_available{job="kube-state-metrics"}
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "StatefulSet {{ $labels.statefulset }} replica mismatch"
+            description: "StatefulSet {{ $labels.statefulset }} in {{ $labels.namespace }} has {{ $value }} unavailable replicas"
+    - name: kubernetes-storage
+      interval: 30s
+      rules:
+        - alert: KubePersistentVolumeUsageCritical
+          expr: (kubelet_volume_stats_used_bytes{job="kubelet"} / kubelet_volume_stats_capacity_bytes{job="kubelet"}) * 100 > 85
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PersistentVolume {{ $labels.persistentvolumeclaim }} usage > 85%"
+            description: "PV {{ $labels.persistentvolumeclaim }} in {{ $labels.namespace }} is at {{ $value }}% capacity"
+        - alert: KubePersistentVolumeFull
+          expr: (kubelet_volume_stats_used_bytes{job="kubelet"} / kubelet_volume_stats_capacity_bytes{job="kubelet"}) * 100 > 95
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "PersistentVolume {{ $labels.persistentvolumeclaim }} is nearly full"
+            description: "PV {{ $labels.persistentvolumeclaim }} in {{ $labels.namespace }} is at {{ $value }}% capacity"
+    - name: observability-stack
+      interval: 30s
+      rules:
+        - alert: PrometheusDown
+          expr: up{job="prometheus"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Prometheus is down"
+            description: "Prometheus instance {{ $labels.instance }} has been down for 2 minutes"
+        - alert: PrometheusMissingRuleEvaluations
+          expr: increase(prometheus_rule_evaluation_failures_total[5m]) > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Prometheus rule evaluation failures"
+            description: "Prometheus is experiencing rule evaluation failures ({{ $value }} in 5m)"
+        - alert: GrafanaDown
+          expr: up{job="grafana"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Grafana is down"
+            description: "Grafana instance has been down for 2 minutes"
+        - alert: LokiDown
+          expr: up{job="loki"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Loki is down"
+            description: "Loki instance has been down for 2 minutes"
+        - alert: TempoDown
+          expr: up{job="tempo"} == 0
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Tempo is down"
+            description: "Tempo instance has been down for 2 minutes"

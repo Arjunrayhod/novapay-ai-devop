@@ -1,0 +1,428 @@
+name: Release Pipeline
+
+on:
+  workflow_run:
+    workflows: ['Build']
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Dry run (skip publishing and release creation)'
+        required: false
+        default: false
+        type: boolean
+      tag:
+        description: 'Tag name to simulate (e.g., v1.2.3)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.workflow_run.head_branch || github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+      semver: ${{ steps.parse.outputs.semver }}
+      major: ${{ steps.parse.outputs.major }}
+      minor: ${{ steps.parse.outputs.minor }}
+      patch: ${{ steps.parse.outputs.patch }}
+      pre_release: ${{ steps.parse.outputs.pre_release }}
+      is_stable: ${{ steps.parse.outputs.is_stable }}
+      dry_run: ${{ steps.dry-run.outputs.dry_run }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve tag
+        id: resolve
+        run: |
+          if [[ '${{ github.event_name }}' == 'workflow_dispatch' ]]; then
+            TAG='${{ github.event.inputs.tag }}'
+            if [[ -z "$TAG" ]]; then
+              TAG='v0.0.0-dryrun'
+            fi
+          else
+            TAG='${{ github.event.workflow_run.head_branch }}'
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Parse semver
+        id: parse
+        run: |
+          TAG='${{ steps.resolve.outputs.tag }}'
+          VERSION="${TAG#v}"
+          if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$ ]]; then
+            echo "semver=$VERSION" >> "$GITHUB_OUTPUT"
+            echo "major=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
+            echo "minor=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
+            echo "patch=${BASH_REMATCH[3]}" >> "$GITHUB_OUTPUT"
+            if [[ -n "${BASH_REMATCH[4]}" ]]; then
+              echo "pre_release=true" >> "$GITHUB_OUTPUT"
+              echo "is_stable=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "pre_release=false" >> "$GITHUB_OUTPUT"
+              echo "is_stable=true" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "ERROR: tag $TAG is not valid semver"
+            exit 1
+          fi
+
+      - name: Determine dry-run
+        id: dry-run
+        run: |
+          EVENT='${{ github.event_name }}'
+          DRY_INPUT='${{ github.event.inputs.dry-run }}'
+          if [[ "$EVENT" == 'workflow_dispatch' && "$DRY_INPUT" == 'true' ]]; then
+            echo "dry_run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dry_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  publish-oci:
+    name: Publish OCI Image
+    needs: [version]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      packages: write
+      id-token: write
+      attestations: write
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+      image_ref: ${{ steps.push.outputs.image_ref }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image
+          path: /tmp/image
+          run-id: ${{ github.event.workflow_run.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Load Docker image
+        run: |
+          docker load --input /tmp/image/image.tar
+
+      - name: Generate OCI tags
+        id: tags
+        run: |
+          BASE='ghcr.io/${{ github.repository }}'
+          VERSION='${{ needs.version.outputs.semver }}'
+          MAJOR='${{ needs.version.outputs.major }}'
+          MINOR='${{ needs.version.outputs.minor }}'
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          TAGS="${BASE}:${VERSION},${BASE}:sha-${SHA_SHORT},${BASE}:major-${MAJOR},${BASE}:${MAJOR}.${MINOR}"
+          if [[ '${{ needs.version.outputs.is_stable }}' == 'true' ]]; then
+            TAGS="${TAGS},${BASE}:latest"
+          fi
+          echo "tags=$TAGS" >> "$GITHUB_OUTPUT"
+
+      - name: Tag Docker image
+        run: |
+          LOAD_OUTPUT=$(docker load --input /tmp/image/image.tar 2>&1)
+          echo "$LOAD_OUTPUT"
+          IMAGE_TAG=$(echo "$LOAD_OUTPUT" | grep -oP 'Loaded image: \K.*' | head -1)
+          if [[ -z "$IMAGE_TAG" ]]; then
+            IMAGE_TAG=$(echo "$LOAD_OUTPUT" | grep -oP 'Loaded image ID: \K.*' | head -1)
+          fi
+          IFS=',' read -ra TAG_ARRAY <<< '${{ steps.tags.outputs.tags }}'
+          for TAG in "${TAG_ARRAY[@]}"; do
+            docker tag "$IMAGE_TAG" "$TAG"
+          done
+
+      - name: Login to GHCR
+        if: needs.version.outputs.dry_run != 'true'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push OCI image
+        id: push
+        if: needs.version.outputs.dry_run != 'true'
+        run: |
+          IFS=',' read -ra TAG_ARRAY <<< '${{ steps.tags.outputs.tags }}'
+          DIGEST=''
+          for TAG in "${TAG_ARRAY[@]}"; do
+            OUTPUT=$(docker push "$TAG" 2>&1)
+            echo "$OUTPUT"
+            if [[ -z "$DIGEST" ]]; then
+              DIGEST=$(echo "$OUTPUT" | grep -oP 'sha256:[a-f0-9]{64}' | head -1)
+            fi
+          done
+          FIRST_TAG=$(echo '${{ steps.tags.outputs.tags }}' | cut -d',' -f1 | xargs)
+          echo "digest=$DIGEST" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${FIRST_TAG}@${DIGEST}" >> "$GITHUB_OUTPUT"
+
+      - name: Attest build provenance
+        if: needs.version.outputs.dry_run != 'true'
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: /tmp/image/image.tar
+
+  package:
+    name: Package
+    needs: [version]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Build Python package
+        run: |
+          pip install build
+          python -m build
+
+      - name: Upload dist packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          retention-days: 90
+          overwrite: true
+
+  generate-notes:
+    name: Generate Release Notes
+    needs: [version]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo '')
+          if [[ -n "$PREV_TAG" ]]; then
+            git log "$PREV_TAG..HEAD" --oneline --no-decorate > changelog.txt
+          else
+            git log --oneline --no-decorate > changelog.txt
+          fi
+
+      - name: Generate release notes
+        run: |
+          {
+            echo '## Release ${{ needs.version.outputs.tag }}'
+            echo ''
+            echo '**Version:** ${{ needs.version.outputs.semver }}'
+            echo '**Commit:** ${{ github.sha }}'
+            echo '**Released:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')'
+            echo ''
+            if [[ '${{ needs.version.outputs.is_stable }}' == 'true' ]]; then
+              echo '**Stable Release**'
+            else
+              echo '**Pre-release**'
+            fi
+            echo ''
+            echo '### Changes'
+            echo ''
+            cat changelog.txt
+            echo ''
+            echo '### Artifacts'
+            echo ''
+            echo '- Python packages (dist/)'
+            echo '- OCI image: ghcr.io/${{ github.repository }}:${{ needs.version.outputs.semver }}'
+            echo '- SBOM (CycloneDX + SPDX)'
+          } > release-notes.md
+
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
+          retention-days: 90
+          overwrite: true
+
+      - name: Upload changelog
+        uses: actions/upload-artifact@v4
+        with:
+          name: changelog
+          path: changelog.txt
+          retention-days: 90
+          overwrite: true
+
+  sign:
+    name: Sign OCI Image
+    needs: [version, publish-oci]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      id-token: write
+      packages: read
+    if: needs.version.outputs.dry_run != 'true'
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+        with:
+          cosign-release: 'v2.2.4'
+
+      - name: Cosign sign image
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+        run: |
+          cosign sign '${{ needs.publish-oci.outputs.image_ref }}' --yes
+
+  provenance:
+    name: Attach Provenance
+    needs: [version, publish-oci]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      attestations: write
+      id-token: write
+    if: needs.version.outputs.dry_run != 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download SBOM artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: sbom
+          path: /tmp/sbom
+          run-id: ${{ github.event.workflow_run.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cosign attest with SBOM
+        env:
+          COSIGN_EXPERIMENTAL: '1'
+        run: |
+          if ls /tmp/sbom/*.json 1>/dev/null 2>&1; then
+            cosign attest '${{ needs.publish-oci.outputs.image_ref }}' \
+              --predicate /tmp/sbom/sbom-cdx.json \
+              --type cyclonedx \
+              --yes
+          else
+            echo 'No SBOM found — skipping cosign attest'
+          fi
+
+  release:
+    name: GitHub Release
+    needs: [version, publish-oci, package, generate-notes, sign, provenance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: /tmp/release-notes
+
+      - name: Download dist packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: /tmp/dist
+
+      - name: Download changelog
+        uses: actions/download-artifact@v4
+        with:
+          name: changelog
+          path: /tmp/changelog
+
+      - name: Create GitHub Release
+        if: needs.version.outputs.dry_run != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG='${{ needs.version.outputs.tag }}'
+          NOTES=$(cat /tmp/release-notes/release-notes.md)
+          ASSETS=()
+          if [[ -d /tmp/dist ]]; then
+            for f in /tmp/dist/*; do
+              if [[ -f "$f" ]]; then
+                ASSETS+=("$f")
+              fi
+            done
+          fi
+          if [[ -f /tmp/changelog/changelog.txt ]]; then
+            ASSETS+=('/tmp/changelog/changelog.txt')
+          fi
+          if [[ '${{ needs.version.outputs.pre_release }}' == 'true' ]]; then
+            gh release create "$TAG" \
+              --title "Release $TAG" \
+              --notes "$NOTES" \
+              --verify-tag \
+              --prerelease \
+              "${ASSETS[@]}"
+          else
+            gh release create "$TAG" \
+              --title "Release $TAG" \
+              --notes "$NOTES" \
+              --verify-tag \
+              --latest \
+              "${ASSETS[@]}"
+          fi
+
+  summary:
+    name: Release Summary
+    if: always()
+    needs: [version, publish-oci, package, generate-notes, sign, provenance, release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate summary
+        run: |
+          echo '## Release Pipeline Summary' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Item | Value |' >> "$GITHUB_STEP_SUMMARY"
+          echo '|------|-------|' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Version | ${{ needs.version.outputs.semver }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Tag | ${{ needs.version.outputs.tag }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Dry Run | ${{ needs.version.outputs.dry_run }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| OCI Digest | ${{ needs.publish-oci.outputs.digest }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| OCI Image | ${{ needs.publish-oci.outputs.image_ref }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| GitHub Release | ${{ needs.version.outputs.tag }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '| Commit | ${{ github.sha }} |' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '## Rollback Procedure' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Rollback OCI Image' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
+          IMAGE_REF='${{ needs.publish-oci.outputs.image_ref }}'
+          REPO='${{ github.repository }}'
+          VERSION='${{ needs.version.outputs.semver }}'
+          echo "docker pull $IMAGE_REF" >> "$GITHUB_STEP_SUMMARY"
+          echo "docker tag $IMAGE_REF ghcr.io/$REPO:$VERSION" >> "$GITHUB_STEP_SUMMARY"
+          echo "docker push ghcr.io/$REPO:$VERSION" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Rollback Python Package' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
+          echo 'pip install aegisai-platform==<previous-version>' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '### Previous Release Tags' >> "$GITHUB_STEP_SUMMARY"
+          echo '' >> "$GITHUB_STEP_SUMMARY"
+          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
+          echo 'git tag -l 'v*' --sort=-v:refname | head -5' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"

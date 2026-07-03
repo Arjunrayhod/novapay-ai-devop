@@ -1,0 +1,102 @@
+name: Lint
+
+on:
+  push:
+    branches: [main, dev, staging]
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - .editorconfig
+      - .gitignore
+  pull_request:
+    branches: [main, dev, staging]
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - .editorconfig
+      - .gitignore
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ruff:
+    name: Ruff
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        mode: [check, format]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install ruff
+        run: pip install ruff
+      - name: Run ruff ${{ matrix.mode }}
+        run: |
+          if [ '${{ matrix.mode }}' = 'check' ]; then
+            ruff check . --output-format=github
+          else
+            ruff format . --check --diff
+          fi
+
+  mypy:
+    name: MyPy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [ruff]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install dependencies
+        run: |
+          pip install mypy
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      - name: Run mypy type checker
+        run: mypy --strict --ignore-missing-imports .
+      - name: Upload mypy report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mypy-report
+          path: .mypy_cache/
+          retention-days: 7
+          overwrite: true
+
+  summary:
+    name: Lint Summary
+    if: always()
+    needs: [ruff, mypy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate pipeline summary
+        run: |
+          echo '## Lint Pipeline Summary' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '| Job | Status |' >> $GITHUB_STEP_SUMMARY
+          echo '|-----|--------|' >> $GITHUB_STEP_SUMMARY
+          echo '| Ruff (check) | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Ruff (format) | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| MyPy | ✅ |' >> $GITHUB_STEP_SUMMARY

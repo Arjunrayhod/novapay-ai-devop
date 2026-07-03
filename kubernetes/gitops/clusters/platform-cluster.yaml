@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: platform-cluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: platform-cluster
+    app.kubernetes.io/part-of: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+type: Opaque
+stringData:
+  name: in-cluster
+  server: https://kubernetes.default.svc
+  config: |
+    {
+      "tlsClientConfig": {
+        "insecure": false
+      }
+    }
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Cluster
+metadata:
+  name: in-cluster
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: in-cluster
+    app.kubernetes.io/part-of: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '-1'
+spec:
+  name: in-cluster
+  server: https://kubernetes.default.svc
+  namespaces:
+    - argocd
+    - default
+    - kube-system
+    - kube-public
+    - kube-node-lease
+  config:
+    tlsClientConfig:
+      insecure: false

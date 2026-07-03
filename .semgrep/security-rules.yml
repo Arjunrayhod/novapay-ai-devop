@@ -1,0 +1,97 @@
+rules:
+  - id: python-no-hardcoded-secrets
+    pattern-either:
+      - pattern: |
+          $VAR = "AKIA$ALPHANUMERIC"
+      - pattern: |
+          $VAR = "sk-$ANYTHING"
+      - pattern: |
+          password = "$PASSWORD"
+      - pattern: |
+          secret = "$SECRET"
+      - pattern: |
+          $VAR = "-----BEGIN $KEYTYPE PRIVATE KEY-----"
+    message: "Potential hardcoded secret detected"
+    severity: ERROR
+    languages:
+      - python
+      - terraform
+      - yaml
+
+  - id: python-no-eval-exec
+    pattern-either:
+      - pattern: eval($VAR)
+      - pattern: exec($VAR)
+      - pattern: |
+          os.system($VAR)
+      - pattern: |
+          subprocess($VAR, shell=True)
+    message: "Code injection risk — eval/exec/shell prohibited. Use safe alternatives."
+    severity: ERROR
+    languages:
+      - python
+
+  - id: python-no-assert-in-production
+    pattern: assert $CONDITION
+    message: "assert statements disabled with python -O. Use proper error handling."
+    severity: WARNING
+    languages:
+      - python
+    paths:
+      exclude:
+        - "tests/*"
+
+  - id: python-no-bare-except
+    pattern: |
+      except:
+    message: "Bare except catches all exceptions including KeyboardInterrupt. Specify exception types."
+    severity: ERROR
+    languages:
+      - python
+
+  - id: python-no-pickle-untrusted
+    pattern: |
+      pickle.loads($VAR)
+    message: "Unsafe deserialization — pickle can execute arbitrary code. Use safe serialization."
+    severity: ERROR
+    languages:
+      - python
+
+  - id: terraform-no-public-ingress
+    pattern: |
+      cidr_blocks = ["0.0.0.0/0"]
+    message: "0.0.0.0/0 ingress is prohibited. Restrict ingress to known IP ranges."
+    severity: ERROR
+    languages:
+      - hcl
+
+  - id: terraform-no-plaintext-secrets
+    patterns:
+      - pattern: |
+          $VAR = $VALUE
+      - pattern-not: |
+          $VAR = var.$_
+      - pattern-not: |
+          $VAR = data.$_
+    message: "Hardcoded values in Terraform may leak secrets. Use variables or data sources."
+    severity: WARNING
+    languages:
+      - hcl
+    paths:
+      include:
+        - "*.tf"
+
+  - id: yaml-no-credentials-in-workflow
+    patterns:
+      - pattern: |
+          $KEY: $VALUE
+      - metavariable-regex:
+          metavariable: "$KEY"
+          regex: "(?:password|secret|token|key|credential)"
+    message: "Credentials detected in workflow file. Use GitHub Secrets instead."
+    severity: ERROR
+    languages:
+      - yaml
+    paths:
+      include:
+        - ".github/workflows/*"

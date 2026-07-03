@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: production-runbooks
+  annotations:
+    aegisai.io/component: runbooks
+
+resources:
+  - incident-response.yaml
+  - rollback-procedure.yaml

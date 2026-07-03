@@ -1,0 +1,22 @@
+# ---------------------------------------------------------------------------
+# Production environment overrides
+# ---------------------------------------------------------------------------
+global:
+  environment: prod
+
+aegisai-common:
+  global:
+    environment: prod
+  deployment:
+    replicas: 3
+    resources:
+      requests:
+        cpu: 150m
+        memory: 250Mi
+      limits:
+        cpu: 300m
+        memory: 400Mi
+    args:
+      - --kubelet-preferred-address-types=InternalIP
+      - --cert-dir=/tmp/certs
+      - --metric-resolution=15s

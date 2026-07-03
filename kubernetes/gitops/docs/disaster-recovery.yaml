@@ -1,0 +1,114 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-disaster-recovery
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gitops-disaster-recovery
+    aegisai.io/component: documentation
+    aegisai.io/doc-type: disaster-recovery
+data:
+  title: "GitOps Disaster Recovery Runbook"
+  version: "1.0.0"
+  dr-scenarios: |
+    SCENARIO 1: Complete ArgoCD Control Plane Loss
+      Impact: ArgoCD unavailable, Applications continue running, GitOps sync paused
+      Recovery Time Objective: 60 minutes
+      Recovery Point Objective: 0 (state stored in Git)
+
+      Recovery Steps:
+        Phase 1 - Restore ArgoCD (10 min)
+          1. Re-create the argocd namespace:
+             kubectl create namespace argocd
+          2. Apply ArgoCD manifests:
+             kubectl kustomize kubernetes/gitops/argocd | kubectl apply -f -
+          3. Wait for ArgoCD to become ready:
+             kubectl wait --for=condition=available --timeout=300s \
+               -n argocd deployment/argocd-server
+          4. Verify ArgoCD API is responding:
+             kubectl get applications -n argocd
+
+        Phase 2 - Restore Configuration (15 min)
+          5. Apply projects and base configs:
+             kubectl kustomize kubernetes/gitops/projects | kubectl apply -f -
+             kubectl kustomize kubernetes/gitops/base | kubectl apply -f -
+             kubectl kustomize kubernetes/gitops/clusters | kubectl apply -f -
+          6. Restore cluster credentials:
+             kubectl kustomize kubernetes/gitops/clusters | kubectl apply -f -
+
+        Phase 3 - Restore Applications (20 min)
+          7. Apply App of Apps:
+             kubectl kustomize kubernetes/gitops/applications | kubectl apply -f -
+          8. Verify all applications sync:
+             argocd app list
+             argocd app sync --all
+          9. Verify ApplicationSets:
+             kubectl kustomize kubernetes/gitops/appsets | kubectl apply -f -
+
+        Phase 4 - Verification (15 min)
+          10. Check all application health:
+              argocd app list -o wide | grep -v Healthy
+          11. Verify Rollouts are operational:
+              kubectl argo rollouts list rollouts --all-namespaces
+          12. Confirm notifications channel is active
+
+    SCENARIO 2: Git Repository Compromise
+      Impact: Malicious changes could be synced to cluster
+      Recovery Time Objective: 30 minutes
+      Recovery Point Objective: Last known-good commit
+
+      Recovery Steps:
+        1. Freeze ArgoCD sync:
+           argocd app set <app-name> --sync-policy none
+        2. Revert repository to last known-good commit:
+           git revert HEAD --no-edit
+           git push origin main
+        3. Rotate repository credentials:
+           Update kubernetes/gitops/base/repo-creds.yaml
+           kubectl kustomize kubernetes/gitops/base | kubectl apply -f -
+        4. Audit cluster for unauthorized resources:
+           kubectl get all --all-namespaces | grep -f <known-resources>
+        5. Re-enable sync:
+           argocd app set <app-name> --sync-policy automated
+        6. Enable manual approval gate for next deploy
+
+    SCENARIO 3: Cluster Failure
+      Impact: Target cluster unavailable, ArgoCD cannot sync
+      Recovery Time Objective: 120 minutes
+      Recovery Point Objective: 0 (desired state in Git)
+
+      Recovery Steps:
+        1. Verify cluster status:
+           argocd cluster list
+        2. Remove failed cluster from ArgoCD:
+           argocd cluster rm <cluster-url>
+        3. Provision new cluster following cluster setup runbook
+        4. Register new cluster:
+           kubectl kustomize kubernetes/gitops/clusters | kubectl apply -f -
+        5. Verify cluster is healthy:
+           argocd cluster list
+        6. Sync all applications to new cluster:
+           argocd app sync --all
+        7. Verify application health:
+           argocd app list -o wide
+
+    SCENARIO 4: etcd Data Loss
+      Impact: ArgoCD state lost, Applications continue running
+      Recovery Time Objective: 45 minutes
+      Recovery Point Objective: 0 (desired state in Git)
+
+      Recovery Steps:
+        1. ArgoCD will auto-recover by re-syncing from Git
+        2. Force a full refresh:
+           argocd app list -o name | xargs -I{} argocd app sync {} --force
+        3. Verify all resource tracking is restored
+
+  dr-team-roster: |
+    DR Lead: Platform Engineering Lead
+    DR Coordinator: DevOps Engineer (on-call)
+    Communication: #incidents Slack channel
+    Escalation: VP of Engineering after 30 min without recovery
+  dr-drill-schedule: |
+    Quarterly full DR drill (all scenarios)
+    Monthly partial DR drill (Scenario 4 - git recovery)
+    Bi-weekly backup verification

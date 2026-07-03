@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rollback-procedure-runbook
+  labels:
+    aegisai.io/component: runbook
+    aegisai.io/runbook-type: rollback-procedure
+data:
+  title: "Production Rollback Procedure"
+  version: "1.0.0"
+  rollback-criteria: |
+    Initiate rollback when ANY of the following conditions are met:
+    - Error rate increases by >5% compared to previous revision
+    - P99 latency exceeds 500ms threshold
+    - Success rate drops below 99.5%
+    - Health check endpoints return non-200 status codes
+    - Automated AnalysisRun marks the rollout as "Failed"
+
+  rollback-methods: |
+    METHOD 1: ArgoCD Application Rollback (For standard Deployments)
+      Steps:
+        1. Identify the previous stable revision:
+           argocd app get <app-name> | grep "HISTORY"
+        2. Rollback to previous revision:
+           argocd app rollback <app-name> <revision-number>
+        3. Verify rollback status:
+           argocd app wait <app-name> --health
+        4. Confirm health restored:
+           argocd app get <app-name>
+
+    METHOD 2: Argo Rollouts Undo (For Rollout resources)
+      Steps:
+        1. List rollout history:
+           kubectl argo rollouts get rollout <rollout-name> -n <namespace>
+        2. Rollback to previous stable revision:
+           kubectl argo rollouts undo <rollout-name> -n <namespace> --to-revision=<revision>
+           OR for immediate full rollback:
+           kubectl argo rollouts abort <rollout-name> -n <namespace>
+        3. Monitor rollback status:
+           kubectl argo rollouts get rollout <rollout-name> -n <namespace> -w
+        4. Verify canary/blue-green settles to stable:
+           kubectl argo rollouts status <rollout-name> -n <namespace>
+
+    METHOD 3: GitOps Revert (Rollback via Git)
+      Steps:
+        1. Revert the problematic commit:
+           git revert <commit-hash>
+        2. Push the revert:
+           git push origin main
+        3. ArgoCD will automatically sync the reverted state (within 3 min default)
+           OR manually sync:
+           argocd app sync <app-name>
+        4. Verify health:
+           argocd app wait <app-name> --health
+
+  rollback-window: |
+    Automatic rollback window: 30 minutes post-deployment
+    Manual rollback window: 2 hours post-deployment (after this, must follow change management)
+    Immediate abort window: First 5 minutes (safe to abort mid-rollout)
+
+  auto-rollback-config: |
+    AnalysisRun failure: Automatic rollback enabled
+    Health check degradation: Automatic rollback via ArgoCD
+    Promotion paused on failure: Manual intervention required
+    Scale down delay: 600 seconds (blue-green) to allow traffic drain
+
+  post-rollback-steps: |
+    1. Verify all services are healthy:
+       kubectl get pods --all-namespaces | grep -v Running
+       kubectl argo rollouts list rollouts --all-namespaces
+    2. Check rollback succeeded in ArgoCD: Application status should show "Healthy"
+    3. Notify team via Slack #deployments channel
+    4. Document rollback reason and trigger in incident log
+    5. Analyze root cause in postmortem before re-deploying
+    6. Clear the deployment pipeline hold

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aegisai-cicd
+  namespace: aegisai-system-security
+  annotations:
+    aegisai.io/service-account-type: cicd
+    eks.amazonaws.com/role-arn: ""
+  labels:
+    aegisai.io/rbac-tier: cicd

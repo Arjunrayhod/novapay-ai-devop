@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: otel-collector
+  annotations:
+    aegisai.io/component: otel-collector
+
+namespace: aegisai-observability
+
+resources:
+  - collector.yaml
+  - service.yaml
+  - config.yaml
+
+labels:
+  - includeSelectors: true
+    pairs:
+      app.kubernetes.io/name: otel-collector
+      aegisai.io/tier: observability

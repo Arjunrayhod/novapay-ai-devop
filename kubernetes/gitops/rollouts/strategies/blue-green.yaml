@@ -1,0 +1,102 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: blue-green-strategy-template
+  labels:
+    aegisai.io/component: rollouts-strategies
+    aegisai.io/strategy: blue-green
+spec:
+  replicas: 5
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bluegreen-app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bluegreen-app
+    spec:
+      containers:
+        - name: app
+          image: public.ecr.aws/nginx/nginx:stable-alpine
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          startupProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 12
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+  strategy:
+    blueGreen:
+      activeService: bluegreen-active
+      previewService: bluegreen-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 600
+      prePromotionAnalysis:
+        templates:
+          - templateName: error-rate
+            clusterScope: false
+          - templateName: latency
+            clusterScope: false
+          - templateName: success-rate
+            clusterScope: false
+        args:
+          - name: namespace
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: service
+            value: bluegreen-app
+      postPromotionAnalysis:
+        templates:
+          - templateName: error-rate
+            clusterScope: false
+          - templateName: latency
+            clusterScope: false
+          - templateName: success-rate
+            clusterScope: false
+        args:
+          - name: namespace
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: service
+            value: bluegreen-app
+      antiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          weight: 100
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: bluegreen-app
+                  topologyKey: kubernetes.io/hostname

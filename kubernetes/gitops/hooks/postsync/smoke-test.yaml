@@ -1,0 +1,96 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: smoke-test
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "10"
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: postsync
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: smoke-test
+          image: public.ecr.aws/docker/library/alpine:3.19
+          command:
+            - sh
+            - -c
+            - |
+              echo "Running post-deployment smoke tests..."
+
+              TARGET_URL="${SMOKE_TEST_URL:-http://localhost:8080}"
+              EXPECTED_STATUS="${EXPECTED_STATUS:-200}"
+
+              echo "Testing endpoint: $TARGET_URL"
+              STATUS=$(wget --server-response --timeout=10 --tries=1 "$TARGET_URL" 2>&1 | grep "HTTP/" | tail -1 | awk '{print $2}')
+
+              if [ "$STATUS" = "$EXPECTED_STATUS" ]; then
+                echo "✅ Smoke test passed: HTTP $STATUS"
+                exit 0
+              else
+                echo "❌ Smoke test failed: Expected HTTP $EXPECTED_STATUS, got HTTP $STATUS"
+                exit 1
+              fi
+          env:
+            - name: SMOKE_TEST_URL
+              value: "http://app-service:8080/health"
+            - name: EXPECTED_STATUS
+              value: "200"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      serviceAccountName: smoke-test-sa
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 300
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: smoke-test-sa
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: postsync
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: smoke-test-role
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: postsync
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "endpoints"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: smoke-test-binding
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+  labels:
+    aegisai.io/component: sync-hook
+    aegisai.io/hook-type: postsync
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: smoke-test-role
+subjects:
+  - kind: ServiceAccount
+    name: smoke-test-sa

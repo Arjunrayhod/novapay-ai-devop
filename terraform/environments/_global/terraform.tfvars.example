@@ -1,0 +1,11 @@
+aws_region       = "ap-south-1"
+owner            = "platform-engineering"
+cost_center      = "cc-global-infra"
+domain_name      = "aegisai.platform"
+state_bucket_name = "aegisai-terraform-state"
+state_lock_table  = "aegisai-terraform-locks"
+
+tags = {
+  EnvironmentType = "global"
+  Criticality     = "tier-0"
+}

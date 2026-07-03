@@ -1,0 +1,89 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gitops-validation
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: gitops-validation
+    aegisai.io/component: documentation
+    aegisai.io/doc-type: validation
+data:
+  title: "GitOps Validation Documentation"
+  version: "1.0.0"
+  validation-pipeline: |
+    PRE-COMMIT VALIDATION (local):
+      Command: make validate
+      Validates: YAML syntax, kustomize build, JSON schema, markdown
+      Config: .yamllint.yml, .markdownlint.yml
+
+    CI VALIDATION (automated on push/PR):
+      Job: yaml-validation
+        Command: yamllint -c .yamllint.yml .
+        Failure: PR blocked, notification sent to author
+      Job: kustomize-build
+        Command: kubectl kustomize kubernetes/envs/*/
+        Failure: PR blocked, deployment pipeline halted
+      Job: actionlint
+        Command: actionlint
+        Failure: PR blocked, workflow issues flagged
+
+    DEPLOYMENT VALIDATION:
+      PreSync Hook: Database migration validation
+      Sync Hook: Data seed verification
+      PostSync Hook: HTTP smoke test against /health endpoint
+      AnalysisTemplate: Error rate, latency, and success rate checks
+      Rollout Strategy: Canary weight steps with automated pause and analysis
+
+    CONTINUOUS VALIDATION:
+      ArgoCD Health Checks: Custom Lua for each CRD
+        - Rollout: Promoted status, canary weight, abort detection
+        - Certificate: Ready condition
+        - Ingress: Load balancer provisioning
+        - SecretStore: Connection status
+      Drift Detection: resource.customizations.ignoreDifferences
+      Sync Windows: Prevent modifications during business hours
+      SelfHeal: Automatic drift correction
+
+    VALIDATION COMMANDS:
+      # Full syntax check
+      yamllint -c .yamllint.yml .
+
+      # Kustomize build for all environments
+      for dir in kubernetes/envs/*/; do
+        kubectl kustomize "$dir" > /dev/null 2>&1 || echo "FAIL: $dir"
+      done
+
+      # Kustomize build for gitops control plane
+      kubectl kustomize kubernetes/gitops > /dev/null 2>&1
+
+      # Actionlint for GitHub workflows
+      actionlint
+
+      # Markdown linting
+      markdownlint '**/*.md' --config .markdownlint.yml
+
+      # JSON validation
+      for file in **/*.json; do
+        python3 -m json.tool "$file" > /dev/null 2>&1
+      done
+
+  validation-gates: |
+    PR Gate:
+      - yamllint passes with no errors
+      - kustomize build succeeds for all overlays
+      - actionlint passes for workflow files
+      - markdownlint passes for documentation
+      - All checks green in CI pipeline
+
+    Deployment Gate:
+      - PreSync hook completes successfully
+      - AnalysisRun passes error-rate < 5%
+      - AnalysisRun passes latency-p99 < 500ms
+      - AnalysisRun passes success-rate > 99.5%
+      - PostSync smoke test returns HTTP 200
+
+    Production Gate:
+      - Sync window is active (daily 22:00-23:00 UTC)
+      - Manual approval from Platform Lead
+      - No active incidents
+      - Previous deployment healthy for >1 hour

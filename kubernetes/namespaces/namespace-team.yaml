@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-team-novapay
+  labels:
+    aegisai.io/tier: team
+    aegisai.io/component: novapay
+    aegisai.io/workload: novapay-digital-bank
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+    aegisai.io/cost-center: novapay
+    aegisai.io/data-classification: sensitive
+    aegisai.io/compliance: pci-dss
+    app.kubernetes.io/name: aegisai-team-novapay
+    app.kubernetes.io/component: novapay
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: novapay-team
+  annotations:
+    aegisai.io/owner: novapay-team
+    aegisai.io/contact: novapay@aegisai.io
+    aegisai.io/purpose: NovaPay digital banking platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-team-paysecure
+  labels:
+    aegisai.io/tier: team
+    aegisai.io/component: paysecure
+    aegisai.io/workload: paysecure-gateway
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+    aegisai.io/cost-center: paysecure
+    aegisai.io/data-classification: sensitive
+    aegisai.io/compliance: pci-dss,soc2
+    app.kubernetes.io/name: aegisai-team-paysecure
+    app.kubernetes.io/component: paysecure
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: paysecure-team
+  annotations:
+    aegisai.io/owner: paysecure-team
+    aegisai.io/contact: paysecure@aegisai.io
+    aegisai.io/purpose: PaySecure payment gateway platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-team-lendflow
+  labels:
+    aegisai.io/tier: team
+    aegisai.io/component: lendflow
+    aegisai.io/workload: lendflow-technologies
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+    aegisai.io/cost-center: lendflow
+    aegisai.io/data-classification: sensitive
+    aegisai.io/compliance: soc2
+    app.kubernetes.io/name: aegisai-team-lendflow
+    app.kubernetes.io/component: lendflow
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: lendflow-team
+  annotations:
+    aegisai.io/owner: lendflow-team
+    aegisai.io/contact: lendflow@aegisai.io
+    aegisai.io/purpose: LendFlow lending technologies platform
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aegisai-team-finserv
+  labels:
+    aegisai.io/tier: team
+    aegisai.io/component: finserv
+    aegisai.io/workload: finserv-digital
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/enforce-version: latest
+    pod-security.kubernetes.io/audit: baseline
+    pod-security.kubernetes.io/warn: baseline
+    aegisai.io/cost-center: finserv
+    aegisai.io/data-classification: sensitive
+    aegisai.io/compliance: pci-dss,soc2,rbi
+    app.kubernetes.io/name: aegisai-team-finserv
+    app.kubernetes.io/component: finserv
+    app.kubernetes.io/part-of: aegisai
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/version: 1.0.0
+    environment: production
+    owner: finserv-team
+  annotations:
+    aegisai.io/owner: finserv-team
+    aegisai.io/contact: finserv@aegisai.io
+    aegisai.io/purpose: FinServ digital financial services platform

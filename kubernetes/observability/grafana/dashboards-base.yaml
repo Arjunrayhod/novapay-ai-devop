@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-base
+  labels:
+    app.kubernetes.io/name: grafana
+data: {}

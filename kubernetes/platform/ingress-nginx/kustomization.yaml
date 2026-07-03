@@ -1,0 +1,27 @@
+# ingress-nginx AegisAI Platform Component
+# https://kubernetes.github.io/ingress-nginx/
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: aegisai-ingress-nginx
+
+commonLabels:
+  aegisai.io/component: ingress-nginx
+  app.kubernetes.io/name: ingress-nginx
+  app.kubernetes.io/part-of: aegisai
+
+# ingress-nginx is installed via Helm.
+# Generate manifests with:
+#   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+#   helm template ingress-nginx ingress-nginx/ingress-nginx \
+#     --namespace aegisai-platform-ingress-nginx \
+#     -f values.yaml > generated.yaml
+#
+# Place generated.yaml here for Kustomize to consume.
+# In future phases, flux-helm-controller or argocd-helm manages this.
+
+resources:
+  # - generated.yaml
+  - namespace.yaml

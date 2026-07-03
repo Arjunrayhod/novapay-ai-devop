@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aegisai-platform-operator
+  namespace: aegisai-system-security
+  annotations:
+    aegisai.io/service-account-type: platform-operator
+    eks.amazonaws.com/role-arn: ""
+  labels:
+    aegisai.io/rbac-tier: platform

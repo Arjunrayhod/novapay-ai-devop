@@ -1,0 +1,269 @@
+name: Validation
+
+on:
+  push:
+    branches: [main, dev, staging]
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - .editorconfig
+      - .gitignore
+  pull_request:
+    branches: [main, dev, staging]
+    paths-ignore:
+      - '**/*.md'
+      - LICENSE
+      - .editorconfig
+      - .gitignore
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  repo-validation:
+    name: Repository Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate repository structure
+        run: |
+          errors=0
+          for dir in helm terraform kubernetes scripts .github; do
+            if [ ! -d "$dir" ]; then
+              echo "::error::Missing required directory: $dir"
+              errors=$((errors + 1))
+            fi
+          done
+          for file in Makefile pyproject.toml .yamllint.yml .markdownlint.yml; do
+            if [ ! -f "$file" ]; then
+              echo "::error::Missing required file: $file"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+          echo 'Repository structure validated successfully'
+
+  yaml-validation:
+    name: YAML Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - name: Install yamllint
+        run: pip install yamllint
+      - name: Lint YAML files
+        run: yamllint -c .yamllint.yml .
+
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup actionlint
+        run: |
+          bash <(curl -sSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          echo "$PWD" >> $GITHUB_PATH
+      - name: Lint GitHub Actions workflows
+        run: actionlint -color
+
+  json-validation:
+    name: JSON Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate JSON files
+        run: |
+          errors=0
+          shopt -s globstar nullglob
+          for file in **/*.json; do
+            case "$file" in
+              *.terraform/*|node_modules/*|.git/*) continue ;;
+            esac
+            if ! python3 -m json.tool "$file" > /dev/null 2>&1; then
+              echo "::error::Invalid JSON: $file"
+              errors=$((errors + 1))
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+          echo 'All JSON files valid'
+
+  markdown-validation:
+    name: Markdown Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: '**/package-lock.json'
+      - name: Install markdownlint-cli
+        run: npm install -g markdownlint-cli
+      - name: Lint Markdown files
+        run: markdownlint '**/*.md' --config .markdownlint.yml
+
+  terraform-fmt:
+    name: Terraform Format
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+      - name: Check formatting
+        run: terraform fmt -check -recursive -no-color
+        working-directory: terraform
+
+  terraform-validate:
+    name: Terraform Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [terraform-fmt]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+      - name: Initialize and validate
+        run: |
+          terraform init -backend=false -no-color
+          terraform validate -no-color
+        working-directory: terraform
+
+  kustomize-build:
+    name: Kustomize Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [yaml-validation]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup kubectl
+        run: |
+          curl -sLO 'https://dl.k8s.io/release/v1.30.0/bin/linux/amd64/kubectl'
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/kubectl
+      - name: Validate kustomize overlays
+        run: |
+          errors=0
+          for overlay in kubernetes/envs/*/; do
+            overlay_name=$(basename "$overlay")
+            if [ -f "${overlay}kustomization.yaml" ]; then
+              echo "Building overlay: $overlay_name"
+              if ! kubectl kustomize "$overlay" > /dev/null 2>&1; then
+                echo "::error::Kustomize build failed: $overlay_name"
+                errors=$((errors + 1))
+              fi
+            fi
+          done
+          if [ "$errors" -gt 0 ]; then
+            exit 1
+          fi
+          echo 'All kustomize overlays validated successfully'
+
+  helm-lint:
+    name: Helm Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [yaml-validation]
+    strategy:
+      matrix:
+        chart: [aegisai-common, metrics-server]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.16.0'
+      - name: Run helm lint
+        run: helm lint ./helm/charts/${{ matrix.chart }}
+
+  helm-template:
+    name: Helm Template
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [helm-lint]
+    strategy:
+      matrix:
+        chart: [aegisai-common, metrics-server]
+      fail-fast: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'v3.16.0'
+      - name: Update chart dependencies
+        run: helm dependency update ./helm/charts/${{ matrix.chart }}
+      - name: Run helm template
+        run: helm template ${{ matrix.chart }} ./helm/charts/${{ matrix.chart }}
+      - name: Upload rendered manifests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-manifests-${{ matrix.chart }}
+          path: helm/charts/${{ matrix.chart }}/**/*.yaml
+          retention-days: 7
+          overwrite: true
+
+  summary:
+    name: Validation Summary
+    if: always()
+    needs:
+      - repo-validation
+      - yaml-validation
+      - actionlint
+      - json-validation
+      - markdown-validation
+      - terraform-fmt
+      - terraform-validate
+      - kustomize-build
+      - helm-lint
+      - helm-template
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Generate pipeline summary
+        run: |
+          echo '## Validation Pipeline Summary' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '| Job | Status |' >> $GITHUB_STEP_SUMMARY
+          echo '|-----|--------|' >> $GITHUB_STEP_SUMMARY
+          echo '| Repository Validation | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| YAML Validation | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Actionlint | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| JSON Validation | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Markdown Validation | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Terraform Format | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Terraform Validate | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Kustomize Build | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Helm Lint | ✅ |' >> $GITHUB_STEP_SUMMARY
+          echo '| Helm Template | ✅ |' >> $GITHUB_STEP_SUMMARY

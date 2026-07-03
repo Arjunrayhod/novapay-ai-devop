@@ -1,0 +1,46 @@
+# MarkdownLint Configuration
+# See: https://github.com/DavidAnson/markdownlint
+
+# Default state for all rules
+default: true
+
+# Line length — relaxed for content documents
+MD013:
+  line_length: 120
+  heading_line_length: 80
+  code_block_line_length: 120
+  tables: false
+
+# Multiple headings with same content — allow
+MD024:
+  siblings_only: true
+
+# Multiple top-level headings — allow in some docs
+MD025:
+  front_matter_title: ""
+
+# Trailing punctuation in heading — relaxed
+MD026:
+  punctuation: ".,;:!。，；：！"
+
+# Inline HTML — allow (mermaid, etc.)
+MD033: false
+
+# Bare URL used — allow
+MD034: false
+
+# Emphasis used instead of heading — allow
+MD036: false
+
+# Fenced code blocks should have a language
+MD040: false
+
+# First line in file should be top-level heading
+MD041: false
+
+# Code block indentation — relaxed
+MD046:
+  style: "fenced"
+
+# File should end with newline — handled by .editorconfig
+MD047: false

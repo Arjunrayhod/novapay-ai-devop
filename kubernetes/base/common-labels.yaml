@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aegisai-common-labels
+  annotations:
+    aegisai.io/description: "Common label set inherited from Terraform governance tags"
+data:
+  aegisai.io/environment: production
+  aegisai.io/cost-center: platform
+  aegisai.io/data-classification: internal
+  aegisai.io/compliance: pci-dss,soc2,rbi
+  aegisai.io/managed-by: terraform
+  aegisai.io/platform: aegisai
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubernetes-recommended-labels
+data:
+  app.kubernetes.io/name: aegisai-platform
+  app.kubernetes.io/component: platform
+  app.kubernetes.io/part-of: aegisai
+  app.kubernetes.io/managed-by: kustomize
+  app.kubernetes.io/version: 1.0.0

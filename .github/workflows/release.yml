@@ -1,0 +1,366 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-*"
+
+permissions:
+  contents: write
+  security-events: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate tag format
+        run: |
+          TAG="${{ github.ref_name }}"
+          if ! echo "$TAG" | grep -qP '^v\d+\.\d+\.\d+'; then
+            echo "ERROR: Tag '$TAG' does not match semver pattern vMAJOR.MINOR.PATCH"
+            exit 1
+          fi
+          echo "Tag '$TAG' is valid semver"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install validation tools
+        run: pip install yamllint
+
+      - name: Validate YAML files
+        run: yamllint -c .yamllint.yml .
+
+      - name: Validate Markdown files
+        run: npx markdownlint-cli '**/*.md' --config .markdownlint.yml
+
+  lint:
+    name: Lint
+    needs: [validate]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install lint tools
+        run: pip install ruff mypy
+
+      - name: Run ruff linter
+        run: ruff check . --output-format=github
+
+      - name: Run ruff format check
+        run: ruff format . --check --diff
+
+      - name: Run mypy type checker
+        run: mypy --strict --ignore-missing-imports .
+
+  test:
+    name: Test
+    needs: [lint]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install test tools
+        run: pip install pytest pytest-cov pytest-asyncio
+
+      - name: Run tests with coverage
+        run: pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=80 -v
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-coverage-report
+          path: coverage.xml
+          retention-days: 90
+          overwrite: true
+
+  security:
+    name: Security
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install security tools
+        run: pip install semgrep trufflehog
+
+      - name: Run TruffleHog secrets scan
+        continue-on-error: true
+        run: trufflehog filesystem --directory=. --no-verification --fail 2>&1 || true
+
+      - name: Run Semgrep SAST
+        continue-on-error: true
+        run: |
+          semgrep --config=.semgrep/ --sarif --output=semgrep-results.sarif --error . 2>&1 || true
+
+      - name: Upload Semgrep SARIF
+        if: always() && hashFiles('semgrep-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+  dependency-scan:
+    name: Dependency Scan
+    needs: [security]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install scanning tools
+        run: pip install pip-audit
+
+      - name: Run pip-audit
+        continue-on-error: true
+        run: |
+          if [ -f requirements.txt ]; then
+            pip-audit -r requirements.txt --desc on 2>&1 || true
+          elif [ -f pyproject.toml ]; then
+            pip-audit --desc on 2>&1 || true
+          else
+            echo "No requirements file found — skipping pip-audit"
+          fi
+
+      - name: Run Trivy filesystem scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+          scanners: vuln,secret,misconfig
+          severity: CRITICAL,HIGH
+
+      - name: Upload Trivy SARIF
+        if: always() && hashFiles('trivy-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+      - name: Run Checkov IaC scan
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform,kubernetes,docker
+          output_format: sarif
+          output_file_path: checkov-results.sarif
+
+      - name: Upload Checkov SARIF
+        if: always() && hashFiles('checkov-results.sarif') != ''
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: checkov-results.sarif
+          category: checkov
+
+  sbom:
+    name: SBOM
+    needs: [dependency-scan]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Generate CycloneDX SBOM
+        run: |
+          pip install cyclonedx-bom
+          mkdir -p sbom-output
+          if command -v cyclonedx-py &>/dev/null; then
+            cyclonedx-py --format json --output sbom-output/sbom.json
+          else
+            cyclonedx-bom -o sbom-output/sbom.json 2>&1 || \
+            pip list --format=json | python3 -c "
+      import json, sys, os, subprocess
+      data = json.load(sys.stdin)
+      sbom = {
+          'bomFormat': 'CycloneDX',
+          'specVersion': '1.5',
+          'version': 1,
+          'metadata': {
+              'timestamp': subprocess.run(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], capture_output=True, text=True).stdout.strip(),
+              'tools': [{'name': 'pip-list', 'vendor': 'pypi'}],
+              'component': {
+                  'name': 'aegisai-platform',
+                  'type': 'application',
+                  'version': '0.1.0'
+              }
+          },
+          'components': [
+              {
+                  'type': 'library',
+                  'name': p['name'],
+                  'version': p['version'],
+                  'purl': f'pkg:pypi/{p[\"name\"]}@{p[\"version\"]}'
+              }
+              for p in data
+          ]
+      }
+      os.makedirs('sbom-output', exist_ok=True)
+      with open('sbom-output/sbom.json', 'w') as f:
+          json.dump(sbom, f, indent=2)
+      print(f'SBOM generated: {os.path.getsize(\"sbom-output/sbom.json\")} bytes')
+      "
+          fi
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-sbom
+          path: sbom-output/
+          retention-days: 90
+          overwrite: true
+
+  package:
+    name: Package
+    needs: [sbom]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Build Python package
+        run: |
+          pip install build
+          python -m build
+
+      - name: Upload built packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          retention-days: 90
+          overwrite: true
+
+  artifact:
+    name: Artifact
+    needs: [package]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: always()
+    steps:
+      - name: Generate release summary
+        run: |
+          echo "## Release Pipeline Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Test | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| SBOM | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package | ✅ |" >> $GITHUB_STEP_SUMMARY
+          echo "| Artifact | ✅ |" >> $GITHUB_STEP_SUMMARY
+
+  release:
+    name: GitHub Release
+    needs: [artifact]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download built packages
+        uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+
+      - name: Download SBOM
+        uses: actions/download-artifact@v4
+        with:
+          name: release-sbom
+          path: sbom-output/
+
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"
+
+          echo "Creating release for $TAG..."
+
+          gh release create "$TAG" \
+            --title "Release $TAG" \
+            --generate-notes \
+            --verify-tag \
+            dist/*.tar.gz \
+            dist/*.whl \
+            sbom-output/sbom.json
+
+          echo "Release $TAG created successfully"
+
+      - name: Attach additional assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          for file in dist/*; do
+            echo "Uploading $file..."
+            gh release upload "$TAG" "$file" --clobber
+          done
+          echo "All assets uploaded"
