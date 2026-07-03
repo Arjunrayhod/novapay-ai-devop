@@ -23,6 +23,7 @@ terraform/.terraform/
 *.tfplan
 .DS_Store
 *.md
+!README.md
 LICENSE
 .env
 .env.*
