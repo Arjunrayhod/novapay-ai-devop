@@ -7,7 +7,7 @@ awsRegion: ap-south-1
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA
+    eks.amazonaws.com/role-arn: ''  # Populated by Terraform IRSA
 
 extraArgs:
   balance-similar-node-groups: true

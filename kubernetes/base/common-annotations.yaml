@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: aegisai-common-annotations
   annotations:
-    aegisai.io/description: "Common annotation set inherited from Terraform governance tags"
+    aegisai.io/description: 'Common annotation set inherited from Terraform governance tags'
 data:
   aegisai.io/environment: production
   aegisai.io/owner: platform-engineering

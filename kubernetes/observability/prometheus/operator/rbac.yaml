@@ -12,10 +12,10 @@ metadata:
   labels:
     app.kubernetes.io/name: prometheus-operator
 rules:
-  - apiGroups: ["apiextensions.k8s.io"]
-    resources: ["customresourcedefinitions"]
-    verbs: ["get", "list", "watch", "patch"]
-  - apiGroups: [""]
+  - apiGroups: ['apiextensions.k8s.io']
+    resources: ['customresourcedefinitions']
+    verbs: ['get', 'list', 'watch', 'patch']
+  - apiGroups: ['']
     resources:
       - nodes
       - pods
@@ -24,29 +24,29 @@ rules:
       - secrets
       - configmaps
       - serviceaccounts
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups: ["apps"]
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['apps']
     resources:
       - statefulsets
       - deployments
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups: ["rbac.authorization.k8s.io"]
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['rbac.authorization.k8s.io']
     resources:
       - clusterroles
       - clusterrolebindings
       - roles
       - rolebindings
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "escalate", "bind"]
-  - apiGroups: ["authentication.k8s.io"]
-    resources: ["tokenreviews"]
-    verbs: ["create"]
-  - apiGroups: ["authorization.k8s.io"]
-    resources: ["subjectaccessreviews"]
-    verbs: ["create"]
-  - apiGroups: ["networking.k8s.io"]
-    resources: ["networkpolicies"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
-  - apiGroups: ["monitoring.coreos.com"]
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete', 'escalate', 'bind']
+  - apiGroups: ['authentication.k8s.io']
+    resources: ['tokenreviews']
+    verbs: ['create']
+  - apiGroups: ['authorization.k8s.io']
+    resources: ['subjectaccessreviews']
+    verbs: ['create']
+  - apiGroups: ['networking.k8s.io']
+    resources: ['networkpolicies']
+    verbs: ['get', 'list', 'watch', 'create', 'update', 'patch', 'delete']
+  - apiGroups: ['monitoring.coreos.com']
     resources:
       - alertmanagers
       - alertmanagerconfigs
@@ -55,7 +55,7 @@ rules:
       - servicemonitors
       - podmonitors
       - probes
-    verbs: ["*"]
+    verbs: ['*']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

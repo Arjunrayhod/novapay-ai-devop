@@ -7,31 +7,31 @@ metadata:
     app.kubernetes.io/name: git-directory-apps
     aegisai.io/generator: git
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: '2'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - git:
         repoURL: https://github.com/novapay/novapay-ai-devops
         revision: HEAD
         directories:
-          - path: "kubernetes/apps/*"
+          - path: 'kubernetes/apps/*'
   template:
     metadata:
-      name: "{{path.basename}}"
+      name: '{{path.basename}}'
       labels:
-        app.kubernetes.io/name: "{{path.basename}}"
+        app.kubernetes.io/name: '{{path.basename}}'
         aegisai.io/generator: git-directory
     spec:
       project: platform
       source:
         repoURL: https://github.com/novapay/novapay-ai-devops
         targetRevision: HEAD
-        path: "{{path}}"
+        path: '{{path}}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: "aegisai-{{path.basename}}"
+        namespace: 'aegisai-{{path.basename}}'
       syncPolicy:
         automated:
           prune: true
@@ -58,10 +58,10 @@ metadata:
     app.kubernetes.io/name: git-scm-provider-apps
     aegisai.io/generator: git-scm
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: '3'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - scmProvider:
         github:
@@ -71,15 +71,15 @@ spec:
           allBranches: true
   template:
     metadata:
-      name: "{{repository}}-{{branch}}"
+      name: '{{repository}}-{{branch}}'
       labels:
-        app.kubernetes.io/name: "{{repository}}-{{branch}}"
+        app.kubernetes.io/name: '{{repository}}-{{branch}}'
         aegisai.io/generator: scm-provider
     spec:
       project: platform
       source:
-        repoURL: "{{ssh_url}}"
-        targetRevision: "{{branch}}"
+        repoURL: '{{ssh_url}}'
+        targetRevision: '{{branch}}'
         path: kubernetes/gitops/applications
       destination:
         server: https://kubernetes.default.svc

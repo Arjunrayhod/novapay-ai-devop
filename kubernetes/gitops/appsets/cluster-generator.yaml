@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/name: platform-cluster-apps
     aegisai.io/generator: cluster
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: '2'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - clusters:
         selector:
@@ -18,10 +18,10 @@ spec:
             aegisai.io/cluster-type: platform
   template:
     metadata:
-      name: "{{name}}-platform-apps"
+      name: '{{name}}-platform-apps'
       labels:
-        app.kubernetes.io/name: "{{name}}-platform-apps"
-        aegisai.io/cluster: "{{name}}"
+        app.kubernetes.io/name: '{{name}}-platform-apps'
+        aegisai.io/cluster: '{{name}}'
     spec:
       project: platform
       source:
@@ -29,7 +29,7 @@ spec:
         targetRevision: HEAD
         path: kubernetes/platform/{{name}}
       destination:
-        server: "{{server}}"
+        server: '{{server}}'
         namespace: aegisai-platform
       syncPolicy:
         automated:
@@ -57,10 +57,10 @@ metadata:
     app.kubernetes.io/name: platform-environment-apps
     aegisai.io/generator: cluster
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: '3'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - clusters:
         selector:
@@ -68,18 +68,18 @@ spec:
             aegisai.io/cluster-type: environment
   template:
     metadata:
-      name: "{{name}}-environment"
+      name: '{{name}}-environment'
       labels:
-        app.kubernetes.io/name: "{{name}}-environment"
-        aegisai.io/cluster: "{{name}}"
+        app.kubernetes.io/name: '{{name}}-environment'
+        aegisai.io/cluster: '{{name}}'
     spec:
-      project: "environment-{{name}}"
+      project: 'environment-{{name}}'
       source:
         repoURL: https://github.com/novapay/novapay-ai-devops
         targetRevision: HEAD
-        path: "kubernetes/envs/{{name}}"
+        path: 'kubernetes/envs/{{name}}'
       destination:
-        server: "{{server}}"
+        server: '{{server}}'
         namespace: argocd
       syncPolicy:
         automated:

@@ -13,7 +13,7 @@ metadata:
   labels:
     app.kubernetes.io/name: prometheus
 rules:
-  - apiGroups: [""]
+  - apiGroups: ['']
     resources:
       - nodes
       - nodes/metrics
@@ -23,19 +23,19 @@ rules:
       - endpoints
       - pods
       - ingresses
-    verbs: ["get", "list", "watch"]
-  - apiGroups: [""]
+    verbs: ['get', 'list', 'watch']
+  - apiGroups: ['']
     resources:
       - configmaps
-    verbs: ["get"]
+    verbs: ['get']
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
-    verbs: ["get", "list", "watch"]
+    verbs: ['get', 'list', 'watch']
   - nonResourceURLs:
       - /metrics
-    verbs: ["get"]
+    verbs: ['get']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

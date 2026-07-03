@@ -44,7 +44,7 @@ spec:
                   key: admin-password
                   optional: true
             - name: GF_INSTALL_PLUGINS
-              value: ""
+              value: ''
           envFrom:
             - configMapRef:
                 name: grafana-config
@@ -64,8 +64,8 @@ spec:
               cpu: 200m
               memory: 256Mi
             limits:
-              cpu: "1"
-              memory: "1Gi"
+              cpu: '1'
+              memory: '1Gi'
           livenessProbe:
             httpGet:
               path: /api/health

@@ -8,8 +8,8 @@ metadata:
     aegisai.io/component: documentation
     aegisai.io/doc-type: architecture
 data:
-  title: "Enterprise GitOps Architecture"
-  version: "1.0.0"
+  title: 'Enterprise GitOps Architecture'
+  version: '1.0.0'
   architecture-overview: |
     The Novapay AI GitOps platform follows a layered enterprise architecture:
 

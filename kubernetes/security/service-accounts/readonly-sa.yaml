@@ -5,6 +5,6 @@ metadata:
   namespace: aegisai-system-security
   annotations:
     aegisai.io/service-account-type: readonly
-    eks.amazonaws.com/role-arn: ""
+    eks.amazonaws.com/role-arn: ''
   labels:
     aegisai.io/rbac-tier: platform

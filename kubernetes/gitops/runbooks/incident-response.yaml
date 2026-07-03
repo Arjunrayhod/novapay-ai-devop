@@ -6,8 +6,8 @@ metadata:
     aegisai.io/component: runbook
     aegisai.io/runbook-type: incident-response
 data:
-  title: "Incident Response Runbook"
-  version: "1.0.0"
+  title: 'Incident Response Runbook'
+  version: '1.0.0'
   severity-levels: |
     SEV1: Critical - Complete service outage or data loss
     SEV2: High - Major feature degradation affecting many users

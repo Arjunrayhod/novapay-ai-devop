@@ -10,7 +10,7 @@ spec:
   template:
     spec:
       containers:
-        - name: "*"
+        - name: '*'
           resources:
             requests:
               cpu: 100m

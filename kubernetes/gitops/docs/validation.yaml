@@ -8,8 +8,8 @@ metadata:
     aegisai.io/component: documentation
     aegisai.io/doc-type: validation
 data:
-  title: "GitOps Validation Documentation"
-  version: "1.0.0"
+  title: 'GitOps Validation Documentation'
+  version: '1.0.0'
   validation-pipeline: |
     PRE-COMMIT VALIDATION (local):
       Command: make validate
@@ -50,7 +50,7 @@ data:
 
       # Kustomize build for all environments
       for dir in kubernetes/envs/*/; do
-        kubectl kustomize "$dir" > /dev/null 2>&1 || echo "FAIL: $dir"
+        kubectl kustomize '$dir' > /dev/null 2>&1 || echo 'FAIL: $dir'
       done
 
       # Kustomize build for gitops control plane
@@ -64,7 +64,7 @@ data:
 
       # JSON validation
       for file in **/*.json; do
-        python3 -m json.tool "$file" > /dev/null 2>&1
+        python3 -m json.tool '$file' > /dev/null 2>&1
       done
 
   validation-gates: |

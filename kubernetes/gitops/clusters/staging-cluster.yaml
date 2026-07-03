@@ -10,7 +10,7 @@ metadata:
     aegisai.io/cluster-type: environment
     aegisai.io/environment: staging
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: '-1'
 type: Opaque
 stringData:
   name: staging
@@ -34,7 +34,7 @@ metadata:
     aegisai.io/cluster-type: environment
     aegisai.io/environment: staging
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: '-1'
 spec:
   name: staging
   server: https://staging-cluster.novapay.io:6443

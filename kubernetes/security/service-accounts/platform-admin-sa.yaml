@@ -5,6 +5,6 @@ metadata:
   namespace: aegisai-system-security
   annotations:
     aegisai.io/service-account-type: platform-admin
-    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA module
+    eks.amazonaws.com/role-arn: ''  # Populated by Terraform IRSA module
   labels:
     aegisai.io/rbac-tier: platform

@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main, dev, staging]
     paths-ignore:
-      - "**/*.md"
+      - '**/*.md'
       - LICENSE
       - .editorconfig
       - .gitignore
@@ -34,7 +34,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: pip
 
       - name: Install validation tools
@@ -57,7 +57,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: pip
 
       - name: Install lint tools
@@ -83,7 +83,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: pip
 
       - name: Install test tools
@@ -112,7 +112,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: pip
 
       - name: Install security tools
@@ -129,7 +129,7 @@ jobs:
 
       - name: Upload Semgrep SARIF
         if: always() && hashFiles('semgrep-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: semgrep-results.sarif
           category: semgrep
@@ -145,7 +145,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
           cache: pip
 
       - name: Install scanning tools
@@ -159,11 +159,11 @@ jobs:
           elif [ -f pyproject.toml ]; then
             pip-audit --desc on 2>&1 || true
           else
-            echo "No requirements file found — skipping pip-audit"
+            echo 'No requirements file found — skipping pip-audit'
           fi
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           scan-type: fs
           scan-ref: .
@@ -174,13 +174,13 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: trivy-results.sarif
           category: trivy
 
       - name: Run Checkov IaC scan
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@v13
         with:
           directory: .
           framework: terraform,kubernetes,docker
@@ -189,7 +189,7 @@ jobs:
 
       - name: Upload Checkov SARIF
         if: always() && hashFiles('checkov-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: checkov-results.sarif
           category: checkov

@@ -1,15 +1,12 @@
-import os
 import sys
+from pathlib import Path
 
-# यह हमारा AI इंजन है जो कोड का रिव्यू करेगा
-def ai_code_audit(file_to_check):
-    print(f"--- 🤖 AI Engine: Scanning {file_to_check} for Security ---")
-    
-    # यहाँ हम बैंक के असली कोड की फाइल को रीड कर रहे हैं
-    with open(file_to_check, "r") as f:
-        code = f.read()
-    
-    # AI नियम: अगर कोड में पासवर्ड या गलतियां हैं तो फेल करो
+
+def ai_code_audit(file_to_check: str) -> bool:
+    print(f"--- 🔍 AI Engine: Scanning {file_to_check} for Security ---")
+
+    code = Path(file_to_check).read_text()
+
     if "api_key" in code or "password" in code:
         print("❌ AI AUDIT FAILED: Hardcoded credentials detected!")
         print("Violation: RBI Security & PCI-DSS v4 Mandate.")
@@ -19,12 +16,12 @@ def ai_code_audit(file_to_check):
         print("Compliance Check: Approved for Production.")
         return True
 
+
 if __name__ == "__main__":
-    # हमारी मुख्य बैंकिंग फाइल को चेक करना
-    target_file = "app.py"
-    if os.path.exists(target_file):
-        success = ai_code_audit(target_file)
+    target_file = Path("app.py")
+    if target_file.exists():
+        success = ai_code_audit(str(target_file))
         if not success:
-            sys.exit(1) # पाइपलाइन को यहीं रोक दो
+            sys.exit(1)
     else:
         print(f"⚠️ {target_file} not found. Skipping audit.")

@@ -48,7 +48,7 @@ jobs:
         if: matrix.target == 'container'
         run: docker build -t ${{ matrix.scan-ref }} -f Dockerfile .
       - name: Run Trivy ${{ matrix.target }} scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           scan-type: ${{ matrix.scan-type }}
           scan-ref: ${{ matrix.scan-ref }}
@@ -66,7 +66,7 @@ jobs:
           overwrite: true
       - name: Upload Trivy SARIF to GitHub Security
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: ${{ matrix.sarif-name }}.sarif
           category: ${{ matrix.sarif-name }}
@@ -103,7 +103,7 @@ jobs:
           overwrite: true
       - name: Upload Gitleaks SARIF to GitHub Security
         if: always() && hashFiles('gitleaks.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: gitleaks.sarif
           category: gitleaks
@@ -140,7 +140,7 @@ jobs:
           overwrite: true
       - name: Upload Semgrep SARIF to GitHub Security
         if: always() && hashFiles('semgrep.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: semgrep.sarif
           category: semgrep
@@ -178,7 +178,7 @@ jobs:
           overwrite: true
       - name: Upload Checkov SARIF to GitHub Security
         if: always() && hashFiles('checkov.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: checkov.sarif
           category: checkov
@@ -202,7 +202,7 @@ jobs:
       - name: Build Docker image for SBOM
         run: docker build -t ${{ env.IMAGE_NAME }}:sbom -f Dockerfile .
       - name: Generate ${{ matrix.format }} SBOM
-        uses: anchore/sbom-action@v0
+        uses: anchore/sbom-action@v1
         with:
           image: ${{ env.IMAGE_NAME }}:sbom
           format: ${{ matrix.syft-format }}
@@ -222,7 +222,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.7.0
+        uses: sigstore/cosign-installer@v3.8.1
         with:
           cosign-release: 'v2.4.1'
       - name: Verify Cosign installation

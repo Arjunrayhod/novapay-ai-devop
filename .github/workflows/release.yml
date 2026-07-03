@@ -133,7 +133,7 @@ jobs:
 
       - name: Upload Semgrep SARIF
         if: always() && hashFiles('semgrep-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: semgrep-results.sarif
           category: semgrep
@@ -167,7 +167,7 @@ jobs:
           fi
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@0.29.0
         with:
           scan-type: fs
           scan-ref: .
@@ -178,13 +178,13 @@ jobs:
 
       - name: Upload Trivy SARIF
         if: always() && hashFiles('trivy-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: trivy-results.sarif
           category: trivy
 
       - name: Run Checkov IaC scan
-        uses: bridgecrewio/checkov-action@v12
+        uses: bridgecrewio/checkov-action@v13
         with:
           directory: .
           framework: terraform,kubernetes,docker
@@ -193,7 +193,7 @@ jobs:
 
       - name: Upload Checkov SARIF
         if: always() && hashFiles('checkov-results.sarif') != ''
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v3.28.0
         with:
           sarif_file: checkov-results.sarif
           category: checkov
@@ -218,39 +218,10 @@ jobs:
           mkdir -p sbom-output
           if command -v cyclonedx-py &>/dev/null; then
             cyclonedx-py --format json --output sbom-output/sbom.json
+          elif command -v cyclonedx-bom &>/dev/null; then
+            cyclonedx-bom -o sbom-output/sbom.json
           else
-            cyclonedx-bom -o sbom-output/sbom.json 2>&1 || \
-            pip list --format=json | python3 -c "
-      import json, sys, os, subprocess
-      data = json.load(sys.stdin)
-      sbom = {
-          'bomFormat': 'CycloneDX',
-          'specVersion': '1.5',
-          'version': 1,
-          'metadata': {
-              'timestamp': subprocess.run(['date', '-u', '+%Y-%m-%dT%H:%M:%SZ'], capture_output=True, text=True).stdout.strip(),
-              'tools': [{'name': 'pip-list', 'vendor': 'pypi'}],
-              'component': {
-                  'name': 'aegisai-platform',
-                  'type': 'application',
-                  'version': '0.1.0'
-              }
-          },
-          'components': [
-              {
-                  'type': 'library',
-                  'name': p['name'],
-                  'version': p['version'],
-                  'purl': f'pkg:pypi/{p[\"name\"]}@{p[\"version\"]}'
-              }
-              for p in data
-          ]
-      }
-      os.makedirs('sbom-output', exist_ok=True)
-      with open('sbom-output/sbom.json', 'w') as f:
-          json.dump(sbom, f, indent=2)
-      print(f'SBOM generated: {os.path.getsize(\"sbom-output/sbom.json\")} bytes')
-      "
+            python scripts/gen-sbom.py sbom-output
           fi
 
       - name: Upload SBOM

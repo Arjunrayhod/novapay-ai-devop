@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: aegisai-common-labels
   annotations:
-    aegisai.io/description: "Common label set inherited from Terraform governance tags"
+    aegisai.io/description: 'Common label set inherited from Terraform governance tags'
 data:
   aegisai.io/environment: production
   aegisai.io/cost-center: platform

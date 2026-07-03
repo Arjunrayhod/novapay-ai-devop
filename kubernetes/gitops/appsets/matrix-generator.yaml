@@ -7,10 +7,10 @@ metadata:
     app.kubernetes.io/name: matrix-cluster-x-services
     aegisai.io/generator: matrix
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: '4'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - matrix:
         generators:
@@ -22,24 +22,24 @@ spec:
               repoURL: https://github.com/novapay/novapay-ai-devops
               revision: HEAD
               directories:
-                - path: "kubernetes/services/*"
+                - path: 'kubernetes/services/*'
   template:
     metadata:
-      name: "{{name}}-{{path.basename}}"
+      name: '{{name}}-{{path.basename}}'
       labels:
-        app.kubernetes.io/name: "{{name}}-{{path.basename}}"
-        aegisai.io/cluster: "{{name}}"
-        aegisai.io/service: "{{path.basename}}"
+        app.kubernetes.io/name: '{{name}}-{{path.basename}}'
+        aegisai.io/cluster: '{{name}}'
+        aegisai.io/service: '{{path.basename}}'
         aegisai.io/generator: matrix
     spec:
-      project: "environment-{{name}}"
+      project: 'environment-{{name}}'
       source:
         repoURL: https://github.com/novapay/novapay-ai-devops
         targetRevision: HEAD
-        path: "{{path}}"
+        path: '{{path}}'
       destination:
-        server: "{{server}}"
-        namespace: "aegisai-{{path.basename}}-{{name}}"
+        server: '{{server}}'
+        namespace: 'aegisai-{{path.basename}}-{{name}}'
       syncPolicy:
         automated:
           prune: true
@@ -67,10 +67,10 @@ metadata:
     app.kubernetes.io/name: matrix-cluster-x-platform
     aegisai.io/generator: matrix
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: '4'
 spec:
   goTemplate: true
-  goTemplateOptions: ["missingkey=error"]
+  goTemplateOptions: ['missingkey=error']
   generators:
     - matrix:
         generators:
@@ -82,24 +82,24 @@ spec:
               repoURL: https://github.com/novapay/novapay-ai-devops
               revision: HEAD
               directories:
-                - path: "kubernetes/addons/*"
+                - path: 'kubernetes/addons/*'
   template:
     metadata:
-      name: "{{name}}-{{path.basename}}"
+      name: '{{name}}-{{path.basename}}'
       labels:
-        app.kubernetes.io/name: "{{name}}-{{path.basename}}"
-        aegisai.io/cluster: "{{name}}"
-        aegisai.io/addon: "{{path.basename}}"
+        app.kubernetes.io/name: '{{name}}-{{path.basename}}'
+        aegisai.io/cluster: '{{name}}'
+        aegisai.io/addon: '{{path.basename}}'
         aegisai.io/generator: matrix
     spec:
       project: platform
       source:
         repoURL: https://github.com/novapay/novapay-ai-devops
         targetRevision: HEAD
-        path: "{{path}}"
+        path: '{{path}}'
       destination:
-        server: "{{server}}"
-        namespace: "aegisai-{{path.basename}}"
+        server: '{{server}}'
+        namespace: 'aegisai-{{path.basename}}'
       syncPolicy:
         automated:
           prune: true

@@ -12,20 +12,20 @@ global:
   owner: platform-engineering
   costCenter: platform
 
-nameOverride: ""
-fullnameOverride: ""
+nameOverride: ''
+fullnameOverride: ''
 
-component: ""
+component: ''
 partOf: aegisai
 
-priorityClassName: ""
+priorityClassName: ''
 
 # ---------------------------------------------------------------------------
 # Image
 # ---------------------------------------------------------------------------
 image:
-  repository: ""
-  tag: ""
+  repository: ''
+  tag: ''
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -37,7 +37,7 @@ imagePullSecrets: []
 service:
   enabled: true
   type: ClusterIP
-  clusterIP: ""
+  clusterIP: ''
   ports:
     - name: http
       port: 80
@@ -45,12 +45,12 @@ service:
       protocol: TCP
   annotations: {}
   labels: {}
-  loadBalancerClass: ""
+  loadBalancerClass: ''
   loadBalancerSourceRanges: []
   sessionAffinity: None
   sessionAffinityConfig: {}
-  externalTrafficPolicy: ""
-  internalTrafficPolicy: ""
+  externalTrafficPolicy: ''
+  internalTrafficPolicy: ''
 
 # ---------------------------------------------------------------------------
 # Deployment
@@ -149,7 +149,7 @@ deployment:
 
   terminationGracePeriodSeconds: 30
 
-  dnsPolicy: ""
+  dnsPolicy: ''
   dnsConfig: {}
 
   initContainers: []
@@ -184,7 +184,7 @@ configmap:
 serviceAccount:
   enabled: true
   create: true
-  name: ""
+  name: ''
   annotations: {}
   labels: {}
   automountServiceAccountToken: true

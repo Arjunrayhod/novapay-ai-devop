@@ -5,7 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PostSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: '10'
   labels:
     aegisai.io/component: sync-hook
     aegisai.io/hook-type: postsync
@@ -37,9 +37,9 @@ spec:
               fi
           env:
             - name: SMOKE_TEST_URL
-              value: "http://app-service:8080/health"
+              value: 'http://app-service:8080/health'
             - name: EXPECTED_STATUS
-              value: "200"
+              value: '200'
           resources:
             requests:
               cpu: 100m
@@ -73,9 +73,9 @@ metadata:
     aegisai.io/component: sync-hook
     aegisai.io/hook-type: postsync
 rules:
-  - apiGroups: [""]
-    resources: ["pods", "services", "endpoints"]
-    verbs: ["get", "list", "watch"]
+  - apiGroups: ['']
+    resources: ['pods', 'services', 'endpoints']
+    verbs: ['get', 'list', 'watch']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

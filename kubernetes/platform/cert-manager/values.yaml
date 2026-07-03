@@ -4,7 +4,7 @@ installCRDs: true
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA for Route53
+    eks.amazonaws.com/role-arn: ''  # Populated by Terraform IRSA for Route53
 
 podSecurityPolicy:
   enabled: false

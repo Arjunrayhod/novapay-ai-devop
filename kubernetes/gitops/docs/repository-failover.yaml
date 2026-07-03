@@ -8,8 +8,8 @@ metadata:
     aegisai.io/component: documentation
     aegisai.io/doc-type: repository-failover
 data:
-  title: "Repository Failover Strategy"
-  version: "1.0.0"
+  title: 'Repository Failover Strategy'
+  version: '1.0.0'
   primary-repository: |
     URL: https://github.com/novapay/novapay-ai-devops
     Type: Git

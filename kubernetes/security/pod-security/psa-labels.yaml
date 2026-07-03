@@ -8,7 +8,7 @@ kind: ConfigMap
 metadata:
   name: aegisai-psa-labels
   annotations:
-    aegisai.io/description: "Pod Security Admission label reference"
+    aegisai.io/description: 'Pod Security Admission label reference'
 data:
   # Privileged (system components, Istio)
   privileged: |

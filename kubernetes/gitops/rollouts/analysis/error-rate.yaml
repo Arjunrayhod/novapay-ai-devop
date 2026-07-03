@@ -9,26 +9,26 @@ spec:
     - name: namespace
     - name: service
     - name: prometheus-address
-      value: "http://prometheus-operated.aegisai-observability:9090"
+      value: 'http://prometheus-operated.aegisai-observability:9090'
     - name: threshold
-      value: "5"
+      value: '5'
     - name: interval
-      value: "60s"
+      value: '60s'
     - name: count
       value: 5
   metrics:
     - name: error-rate
-      count: "{{args.count}}"
-      interval: "{{args.interval}}"
+      count: '{{args.count}}'
+      interval: '{{args.interval}}'
       successCondition: result < {{args.threshold}}
       failureLimit: 2
       provider:
         prometheus:
-          address: "{{args.prometheus-address}}"
+          address: '{{args.prometheus-address}}'
           query: >
             (
-              sum(rate(http_requests_total{namespace="{{args.namespace}}", service="{{args.service}}", status=~"5.."}[{{args.interval}}]))
+              sum(rate(http_requests_total{namespace='{{args.namespace}}', service='{{args.service}}', status=~'5..'}[{{args.interval}}]))
               /
-              sum(rate(http_requests_total{namespace="{{args.namespace}}", service="{{args.service}}"}[{{args.interval}}]))
+              sum(rate(http_requests_total{namespace='{{args.namespace}}', service='{{args.service}}'}[{{args.interval}}]))
               * 100
             )

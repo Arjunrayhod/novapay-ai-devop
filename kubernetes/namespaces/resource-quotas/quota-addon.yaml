@@ -6,11 +6,11 @@ metadata:
     aegisai.io/quota-tier: addon
 spec:
   hard:
-    pods: "20"
-    requests.cpu: "4"
+    pods: '20'
+    requests.cpu: '4'
     requests.memory: 16Gi
-    limits.cpu: "8"
+    limits.cpu: '8'
     limits.memory: 32Gi
-    configmaps: "10"
-    secrets: "10"
-    services: "5"
+    configmaps: '10'
+    secrets: '10'
+    services: '5'

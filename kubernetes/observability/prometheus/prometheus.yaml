@@ -31,11 +31,11 @@ spec:
   shards: 1
   resources:
     requests:
-      cpu: "1"
-      memory: "2Gi"
+      cpu: '1'
+      memory: '2Gi'
     limits:
-      cpu: "4"
-      memory: "8Gi"
+      cpu: '4'
+      memory: '8Gi'
   storage:
     volumeClaimTemplate:
       spec:

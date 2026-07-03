@@ -6,12 +6,12 @@ metadata:
     aegisai.io/quota-tier: team
 spec:
   hard:
-    pods: "50"
-    requests.cpu: "8"
+    pods: '50'
+    requests.cpu: '8'
     requests.memory: 32Gi
-    limits.cpu: "16"
+    limits.cpu: '16'
     limits.memory: 64Gi
-    configmaps: "20"
-    secrets: "20"
-    persistentvolumeclaims: "10"
-    services: "10"
+    configmaps: '20'
+    secrets: '20'
+    persistentvolumeclaims: '10'
+    services: '10'

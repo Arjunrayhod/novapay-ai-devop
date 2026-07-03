@@ -8,8 +8,8 @@ metadata:
     aegisai.io/component: documentation
     aegisai.io/doc-type: disaster-recovery
 data:
-  title: "GitOps Disaster Recovery Runbook"
-  version: "1.0.0"
+  title: 'GitOps Disaster Recovery Runbook'
+  version: '1.0.0'
   dr-scenarios: |
     SCENARIO 1: Complete ArgoCD Control Plane Loss
       Impact: ArgoCD unavailable, Applications continue running, GitOps sync paused

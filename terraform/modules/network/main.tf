@@ -163,16 +163,16 @@ resource "aws_route_table_association" "public" {
 locals {
   private_app_route_tables = merge(
     var.nat_gateway_strategy == "single" ? {
-      "${local.network_prefix}-app-rt" => {
-        az_index          = 0
-        nat_gw_available  = local.nat_gateway_count > 0
+      ("${local.network_prefix}-app-rt") = {
+        az_index         = 0
+        nat_gw_available = local.nat_gateway_count > 0
       }
     } : {},
     var.nat_gateway_strategy == "per_az" ? {
       for i, az in var.availability_zones :
       "${local.network_prefix}-app-rt-${i}" => {
-        az_index          = i
-        nat_gw_available  = local.nat_gateway_count > i
+        az_index         = i
+        nat_gw_available = local.nat_gateway_count > i
       }
     } : {},
   )
@@ -207,7 +207,7 @@ resource "aws_route_table_association" "private_app" {
 
   route_table_id = var.nat_gateway_strategy == "per_az" ? (
     aws_route_table.private_app["${local.network_prefix}-app-rt-${index(var.availability_zones, each.value.availability_zone)}"].id
-  ) : (
+    ) : (
     aws_route_table.private_app["${local.network_prefix}-app-rt"].id
   )
 }
@@ -222,12 +222,12 @@ locals {
     var.nat_gateway_strategy == "per_az" ? {
       for i, az in var.availability_zones :
       "${local.network_prefix}-data-rt-${i}" => {
-        az_index      = i
+        az_index         = i
         nat_gw_available = local.nat_gateway_count > i
       }
-    } : {
-      "${local.network_prefix}-data-rt" => {
-        az_index      = 0
+      } : {
+      ("${local.network_prefix}-data-rt") = {
+        az_index         = 0
         nat_gw_available = local.nat_gateway_count > 0
       }
     }
@@ -262,7 +262,7 @@ resource "aws_route_table_association" "private_data" {
 
   route_table_id = var.nat_gateway_strategy == "per_az" ? (
     aws_route_table.private_data["${local.network_prefix}-data-rt-${index(var.availability_zones, each.value.availability_zone)}"].id
-  ) : (
+    ) : (
     aws_route_table.private_data["${local.network_prefix}-data-rt"].id
   )
 }
@@ -366,7 +366,7 @@ resource "aws_flow_log" "this" {
   max_aggregation_interval = 60
 
   log_destination = var.flow_logs_destination == "cloudwatch" ? aws_cloudwatch_log_group.flow_logs[0].arn : var.flow_logs_bucket_arn
-  log_format     = var.flow_logs_custom_format
+  log_format      = var.flow_logs_custom_format
 
   iam_role_arn = var.flow_logs_destination == "cloudwatch" ? aws_iam_role.flow_logs[0].arn : null
 
@@ -382,8 +382,8 @@ resource "aws_flow_log" "this" {
 resource "aws_vpc_endpoint" "s3_gateway" {
   count = var.enable_s3_gateway_endpoint ? 1 : 0
 
-  vpc_id       = aws_vpc.this.id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_endpoint_type = "Gateway"
 
   route_table_ids = concat(
@@ -400,8 +400,8 @@ resource "aws_vpc_endpoint" "s3_gateway" {
 resource "aws_vpc_endpoint" "dynamodb_gateway" {
   count = var.enable_dynamodb_gateway_endpoint ? 1 : 0
 
-  vpc_id       = aws_vpc.this.id
-  service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
   vpc_endpoint_type = "Gateway"
 
   route_table_ids = concat(
@@ -466,7 +466,7 @@ resource "aws_security_group" "default_deny" {
   vpc_id      = aws_vpc.this.id
 
   tags = merge(local.merged_tags, {
-    Name = "${local.network_prefix}-default-deny"
+    Name    = "${local.network_prefix}-default-deny"
     Purpose = "default-deny-framework"
   })
 }
@@ -495,7 +495,7 @@ resource "aws_security_group" "intra_vpc" {
   }
 
   tags = merge(local.merged_tags, {
-    Name = "${local.network_prefix}-intra-vpc"
+    Name    = "${local.network_prefix}-intra-vpc"
     Purpose = "intra-vpc-communication"
   })
 }

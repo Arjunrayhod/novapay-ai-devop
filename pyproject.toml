@@ -47,7 +47,6 @@ select = [
 ]
 ignore = [
     "D100", "D101", "D102", "D103", "D104", "D105", "D107",  # docstrings (optional)
-    "ANN101", "ANN102",  # self/cls type annotations
     "ANN401",  # dynamic types
     "PLR0913",  # too many args
     "PLR2004",  # magic value comparisons
@@ -74,9 +73,7 @@ disallow_any_decorated = false
 disallow_any_explicit = false
 no_implicit_optional = true
 show_error_codes = true
-
-[tool.mypy.per-file-ignores]
-"tests/*" = ["allow-untyped-defs", "allow-incomplete-defs"]
+exclude = ["build/", "dist/", "aegisai_platform.egg-info/"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"

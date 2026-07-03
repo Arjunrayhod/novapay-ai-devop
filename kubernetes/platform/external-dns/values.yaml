@@ -8,7 +8,7 @@ aws:
 
 serviceAccount:
   annotations:
-    eks.amazonaws.com/role-arn: ""  # Populated by Terraform IRSA
+    eks.amazonaws.com/role-arn: ''  # Populated by Terraform IRSA
 
 policy: sync
 txtOwnerId: aegisai

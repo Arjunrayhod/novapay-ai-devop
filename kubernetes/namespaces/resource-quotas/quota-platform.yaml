@@ -6,14 +6,14 @@ metadata:
     aegisai.io/quota-tier: platform
 spec:
   hard:
-    pods: "200"
-    requests.cpu: "32"
+    pods: '200'
+    requests.cpu: '32'
     requests.memory: 128Gi
-    limits.cpu: "64"
+    limits.cpu: '64'
     limits.memory: 256Gi
-    configmaps: "50"
-    secrets: "50"
-    persistentvolumeclaims: "20"
-    services: "20"
-    services.loadbalancers: "5"
-    services.nodeports: "10"
+    configmaps: '50'
+    secrets: '50'
+    persistentvolumeclaims: '20'
+    services: '20'
+    services.loadbalancers: '5'
+    services.nodeports: '10'

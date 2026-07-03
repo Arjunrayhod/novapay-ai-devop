@@ -16,7 +16,7 @@ spec:
       - dns01:
           route53:
             region: ap-south-1
-            hostedZoneID: ""  # Populated from Terraform
+            hostedZoneID: ''  # Populated from Terraform
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -34,4 +34,4 @@ spec:
       - dns01:
           route53:
             region: ap-south-1
-            hostedZoneID: ""  # Populated from Terraform
+            hostedZoneID: ''  # Populated from Terraform

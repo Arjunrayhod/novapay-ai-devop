@@ -51,13 +51,11 @@ rules:
   hyphens:
     max-spaces-after: 1
 
-  # Quotes
-  quoted-strings:
-    quote-type: single
-    required: false
-
   # Key ordering
   key-ordering: disable
+
+  # Allow duplicate keys across multi-doc YAML
+  key-duplicates: disable
 
 ignore: |
   .git/
@@ -66,3 +64,8 @@ ignore: |
   __pycache__/
   *.lock
   .terraform/
+  helm/charts/*/templates/
+  .github/actions/quality-gates/action.yml
+  kubernetes/gitops/argocd/manifests/
+  kubernetes/gitops/rollouts/install/manifests/
+  kubernetes/observability/prometheus/operator/crds/

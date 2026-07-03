@@ -27,38 +27,38 @@ spec:
       duration: 2h
       applications:
         - '*-prod'
-      description: "Production deployment window - daily 22:00-00:00 UTC"
+      description: 'Production deployment window - daily 22:00-00:00 UTC'
       manualSync: true
     - kind: deny
       schedule: '0 8 * * 1-5'
       duration: 14h
       applications:
         - '*-prod'
-      description: "Block prod syncs during business hours Mon-Fri 08:00-22:00 UTC"
+      description: 'Block prod syncs during business hours Mon-Fri 08:00-22:00 UTC'
     - kind: allow
       schedule: '0 6 * * 1-5'
       duration: 2h
       applications:
         - '*-staging'
-      description: "Staging deployment window - daily 06:00-08:00 UTC weekdays"
+      description: 'Staging deployment window - daily 06:00-08:00 UTC weekdays'
     - kind: allow
       schedule: '0 0 * * *'
       duration: 168h
       applications:
         - '*-dev'
-      description: "Dev deployment always allowed"
+      description: 'Dev deployment always allowed'
     - kind: deny
       schedule: '0 0 25 12 *'
       duration: 72h
       applications:
         - '*'
-      description: "Global freeze: Christmas Dec 25-28"
+      description: 'Global freeze: Christmas Dec 25-28'
     - kind: deny
       schedule: '0 0 1 1 *'
       duration: 48h
       applications:
         - '*'
-      description: "Global freeze: New Year Jan 1-2"
+      description: 'Global freeze: New Year Jan 1-2'
   orphanedResources:
     warn: true
   roles:

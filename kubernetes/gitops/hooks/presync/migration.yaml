@@ -5,7 +5,7 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: HookSucceeded
-    argocd.argoproj.io/sync-wave: "-5"
+    argocd.argoproj.io/sync-wave: '-5'
   labels:
     aegisai.io/component: sync-hook
     aegisai.io/hook-type: presync
@@ -56,9 +56,9 @@ metadata:
     aegisai.io/component: sync-hook
     aegisai.io/hook-type: presync
 rules:
-  - apiGroups: [""]
-    resources: ["secrets", "configmaps"]
-    verbs: ["get", "list"]
+  - apiGroups: ['']
+    resources: ['secrets', 'configmaps']
+    verbs: ['get', 'list']
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding

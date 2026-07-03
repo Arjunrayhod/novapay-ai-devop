@@ -7,7 +7,7 @@ metadata:
 spec:
   limits:
     - max:
-        cpu: "8"
+        cpu: '8'
         memory: 32Gi
       min:
         cpu: 10m

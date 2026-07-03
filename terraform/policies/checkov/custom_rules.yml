@@ -6,41 +6,42 @@
 # Rule: Tags must include mandatory keys on all taggable resources
 metadata:
   id: CUSTOM_AWS_TAG_001
-  name: "All taggable resources must have mandatory tags"
-  category: "GENERAL_SECURITY"
+  name: 'All taggable resources must have mandatory tags'
+  category: 'GENERAL_SECURITY'
 
 definition:
-  cond_type: "connection"
+  cond_type: 'connection'
   resource_types:
-    - "aws_instance"
-    - "aws_vpc"
-    - "aws_subnet"
-    - "aws_s3_bucket"
-    - "aws_eks_cluster"
-    - "aws_rds_cluster"
-    - "aws_dynamodb_table"
-    - "aws_lb"
-    - "aws_security_group"
-    - "aws_ecr_repository"
-    - "aws_kms_key"
-  attribute: "tags"
-  operator: "contains"
-  value: "Environment"
+    - 'aws_instance'
+    - 'aws_vpc'
+    - 'aws_subnet'
+    - 'aws_s3_bucket'
+    - 'aws_eks_cluster'
+    - 'aws_rds_cluster'
+    - 'aws_dynamodb_table'
+    - 'aws_lb'
+    - 'aws_security_group'
+    - 'aws_ecr_repository'
+    - 'aws_kms_key'
+  attribute: 'tags'
+  operator: 'contains'
+  value: 'Environment'
 
+---
 # Rule: Resources must have a names that include environment prefix
 metadata:
   id: CUSTOM_AWS_NAMING_001
-  name: "Resources must follow naming convention"
-  category: "GENERAL_SECURITY"
+  name: 'Resources must follow naming convention'
+  category: 'GENERAL_SECURITY'
 
 definition:
-  cond_type: "attribute"
+  cond_type: 'attribute'
   resource_types:
-    - "aws_instance"
-    - "aws_vpc"
-    - "aws_subnet"
-    - "aws_s3_bucket"
-    - "aws_eks_cluster"
-  attribute: "tags.Name"
-  operator: "regex_match"
-  value: "^(dev|staging|prod|_global)-[a-z0-9-]+$"
+    - 'aws_instance'
+    - 'aws_vpc'
+    - 'aws_subnet'
+    - 'aws_s3_bucket'
+    - 'aws_eks_cluster'
+  attribute: 'tags.Name'
+  operator: 'regex_match'
+  value: '^(dev|staging|prod|_global)-[a-z0-9-]+$'

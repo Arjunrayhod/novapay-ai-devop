@@ -6,8 +6,8 @@ metadata:
     aegisai.io/component: runbook
     aegisai.io/runbook-type: rollback-procedure
 data:
-  title: "Production Rollback Procedure"
-  version: "1.0.0"
+  title: 'Production Rollback Procedure'
+  version: '1.0.0'
   rollback-criteria: |
     Initiate rollback when ANY of the following conditions are met:
     - Error rate increases by >5% compared to previous revision

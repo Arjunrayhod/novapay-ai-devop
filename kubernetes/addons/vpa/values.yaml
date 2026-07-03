@@ -4,13 +4,13 @@
 recommender:
   enabled: true
   extraArgs:
-    vpa-object-namespace: "*"
-    metrics-for-rec recommendation: ""
+    vpa-object-namespace: '*'
+    metrics-for-rec recommendation: ''
 
 updater:
   enabled: true
   extraArgs:
-    min-replicas: "2"
+    min-replicas: '2'
 
 admissionController:
   enabled: true

@@ -10,7 +10,7 @@ metadata:
     aegisai.io/cluster-type: environment
     aegisai.io/environment: prod
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: '-1'
 type: Opaque
 stringData:
   name: prod
@@ -34,7 +34,7 @@ metadata:
     aegisai.io/cluster-type: environment
     aegisai.io/environment: prod
   annotations:
-    argocd.argoproj.io/sync-wave: "-1"
+    argocd.argoproj.io/sync-wave: '-1'
 spec:
   name: prod
   server: https://prod-cluster.novapay.io:6443

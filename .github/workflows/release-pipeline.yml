@@ -268,7 +268,7 @@ jobs:
     if: needs.version.outputs.dry_run != 'true'
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@v3.8.1
         with:
           cosign-release: 'v2.2.4'
 
