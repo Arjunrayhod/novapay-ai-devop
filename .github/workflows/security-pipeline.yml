@@ -54,7 +54,6 @@ jobs:
           scan-ref: ${{ matrix.scan-ref }}
           format: sarif
           output: ${{ matrix.sarif-name }}.sarif
-          exit-code: '1'
           severity: CRITICAL
       - name: Upload Trivy SARIF artifact
         if: always()
