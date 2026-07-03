@@ -168,7 +168,7 @@ jobs:
           fi
 
       - name: Run Trivy filesystem scan
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: fs
           scan-ref: .
@@ -185,7 +185,7 @@ jobs:
           category: trivy
 
       - name: Run Checkov IaC scan
-        uses: bridgecrewio/checkov-action@v13
+        uses: bridgecrewio/checkov-action@v12.1347.0
         with:
           directory: .
           framework: terraform,kubernetes,docker

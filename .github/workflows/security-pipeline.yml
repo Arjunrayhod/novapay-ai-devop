@@ -48,7 +48,7 @@ jobs:
         if: matrix.target == 'container'
         run: docker build -t ${{ matrix.scan-ref }} -f Dockerfile .
       - name: Run Trivy ${{ matrix.target }} scan
-        uses: aquasecurity/trivy-action@0.29.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           scan-type: ${{ matrix.scan-type }}
           scan-ref: ${{ matrix.scan-ref }}
