@@ -15,8 +15,6 @@ provider "aws" {
 }
 
 provider "azurerm" {
-  count = var.enable_azure_provider ? 1 : 0
-
   features {
     resource_group {
       prevent_deletion_if_contains_resources = false
@@ -28,8 +26,6 @@ provider "azurerm" {
 }
 
 provider "google" {
-  count = var.enable_gcp_provider ? 1 : 0
-
   project = var.gcp_project_id
   region  = var.gcp_region
 }

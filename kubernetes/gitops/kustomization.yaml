@@ -13,11 +13,14 @@ labels:
       aegisai.io/platform: aegisai
       aegisai.io/tier: platform
 
+patches:
+  - path: notifications/argocd-notifications-cm.yaml
+  - path: notifications/argocd-notifications-secret.yaml
+
 resources:
   - argocd
   - rollouts
   - appsets
-  - notifications
   - hooks
   - runbooks
   - projects

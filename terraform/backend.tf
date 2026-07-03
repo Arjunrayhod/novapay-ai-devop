@@ -7,7 +7,7 @@ terraform {
     encrypt        = true
     kms_key_id     = "alias/terraform-state-key"
     dynamodb_table = "aegisai-terraform-locks"
-    lock_timeout   = "10m"
+
 
     # Full backend config is supplied per environment via CI/CD pipeline.
     # See terraform/bootstrap/README.md for the bootstrap workflow.
