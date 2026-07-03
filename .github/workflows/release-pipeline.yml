@@ -57,16 +57,22 @@ jobs:
           TAG='${{ steps.resolve.outputs.tag }}'
           VERSION="${TAG#v}"
           if [[ "$VERSION" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(-.*)?$ ]]; then
-            echo "semver=$VERSION" >> "$GITHUB_OUTPUT"
-            echo "major=${BASH_REMATCH[1]}" >> "$GITHUB_OUTPUT"
-            echo "minor=${BASH_REMATCH[2]}" >> "$GITHUB_OUTPUT"
-            echo "patch=${BASH_REMATCH[3]}" >> "$GITHUB_OUTPUT"
+            {
+              echo "semver=$VERSION"
+              echo "major=${BASH_REMATCH[1]}"
+              echo "minor=${BASH_REMATCH[2]}"
+              echo "patch=${BASH_REMATCH[3]}"
+            } >> "$GITHUB_OUTPUT"
             if [[ -n "${BASH_REMATCH[4]}" ]]; then
-              echo "pre_release=true" >> "$GITHUB_OUTPUT"
-              echo "is_stable=false" >> "$GITHUB_OUTPUT"
+              {
+                echo "pre_release=true"
+                echo "is_stable=false"
+              } >> "$GITHUB_OUTPUT"
             else
-              echo "pre_release=false" >> "$GITHUB_OUTPUT"
-              echo "is_stable=true" >> "$GITHUB_OUTPUT"
+              {
+                echo "pre_release=false"
+                echo "is_stable=true"
+              } >> "$GITHUB_OUTPUT"
             fi
           else
             echo "ERROR: tag $TAG is not valid semver"
@@ -222,7 +228,7 @@ jobs:
             echo ''
             echo '**Version:** ${{ needs.version.outputs.semver }}'
             echo '**Commit:** ${{ github.sha }}'
-            echo '**Released:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')'
+            echo "**Released:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
             echo ''
             if [[ '${{ needs.version.outputs.is_stable }}' == 'true' ]]; then
               echo '**Stable Release**'
@@ -382,39 +388,41 @@ jobs:
     steps:
       - name: Generate summary
         run: |
-          echo '## Release Pipeline Summary' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '| Item | Value |' >> "$GITHUB_STEP_SUMMARY"
-          echo '|------|-------|' >> "$GITHUB_STEP_SUMMARY"
-          echo '| Version | ${{ needs.version.outputs.semver }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| Tag | ${{ needs.version.outputs.tag }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| Dry Run | ${{ needs.version.outputs.dry_run }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| OCI Digest | ${{ needs.publish-oci.outputs.digest }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| OCI Image | ${{ needs.publish-oci.outputs.image_ref }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| GitHub Release | ${{ needs.version.outputs.tag }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '| Commit | ${{ github.sha }} |' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '## Rollback Procedure' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '### Rollback OCI Image' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
-          IMAGE_REF='${{ needs.publish-oci.outputs.image_ref }}'
-          REPO='${{ github.repository }}'
-          VERSION='${{ needs.version.outputs.semver }}'
-          echo "docker pull $IMAGE_REF" >> "$GITHUB_STEP_SUMMARY"
-          echo "docker tag $IMAGE_REF ghcr.io/$REPO:$VERSION" >> "$GITHUB_STEP_SUMMARY"
-          echo "docker push ghcr.io/$REPO:$VERSION" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '### Rollback Python Package' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
-          echo 'pip install aegisai-platform==<previous-version>' >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '### Previous Release Tags' >> "$GITHUB_STEP_SUMMARY"
-          echo '' >> "$GITHUB_STEP_SUMMARY"
-          echo '```bash' >> "$GITHUB_STEP_SUMMARY"
-          echo 'git tag -l 'v*' --sort=-v:refname | head -5' >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo '## Release Pipeline Summary'
+            echo ''
+            echo '| Item | Value |'
+            echo '|------|-------|'
+            echo '| Version | ${{ needs.version.outputs.semver }} |'
+            echo '| Tag | ${{ needs.version.outputs.tag }} |'
+            echo '| Dry Run | ${{ needs.version.outputs.dry_run }} |'
+            echo '| OCI Digest | ${{ needs.publish-oci.outputs.digest }} |'
+            echo '| OCI Image | ${{ needs.publish-oci.outputs.image_ref }} |'
+            echo '| GitHub Release | ${{ needs.version.outputs.tag }} |'
+            echo '| Commit | ${{ github.sha }} |'
+            echo ''
+            echo '## Rollback Procedure'
+            echo ''
+            echo '### Rollback OCI Image'
+            echo ''
+            echo '```bash'
+            IMAGE_REF='${{ needs.publish-oci.outputs.image_ref }}'
+            REPO='${{ github.repository }}'
+            VERSION='${{ needs.version.outputs.semver }}'
+            echo "docker pull $IMAGE_REF"
+            echo "docker tag $IMAGE_REF ghcr.io/$REPO:$VERSION"
+            echo "docker push ghcr.io/$REPO:$VERSION"
+            echo '```'
+            echo ''
+            echo '### Rollback Python Package'
+            echo ''
+            echo '```bash'
+            echo 'pip install aegisai-platform==<previous-version>'
+            echo '```'
+            echo ''
+            echo '### Previous Release Tags'
+            echo ''
+            echo '```bash'
+            echo "git tag -l 'v*' --sort=-v:refname | head -5"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

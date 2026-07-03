@@ -229,7 +229,7 @@ jobs:
         run: cosign version
       - name: Set up keyless signing environment
         run: |
-          echo 'COSIGN_EXPERIMENTAL=1' >> $GITHUB_ENV
+          echo 'COSIGN_EXPERIMENTAL=1' >> "$GITHUB_ENV"
           echo 'Keyless signing environment ready'
 
   dependency-review:
@@ -264,16 +264,18 @@ jobs:
     steps:
       - name: Generate security summary
         run: |
-          echo '## Security Pipeline Summary' >> $GITHUB_STEP_SUMMARY
-          echo '' >> $GITHUB_STEP_SUMMARY
-          echo '| Scan | Status | SARIF Uploaded |' >> $GITHUB_STEP_SUMMARY
-          echo '|------|--------|----------------|' >> $GITHUB_STEP_SUMMARY
-          echo '| Trivy Filesystem | ✅ | ✅ |' >> $GITHUB_STEP_SUMMARY
-          echo '| Trivy Container | ✅ | ✅ |' >> $GITHUB_STEP_SUMMARY
-          echo '| Gitleaks | ✅ | ✅ |' >> $GITHUB_STEP_SUMMARY
-          echo '| Semgrep | ✅ | ✅ |' >> $GITHUB_STEP_SUMMARY
-          echo '| Checkov | ✅ | ✅ |' >> $GITHUB_STEP_SUMMARY
-          echo '| SBOM (CycloneDX) | ✅ | — |' >> $GITHUB_STEP_SUMMARY
-          echo '| SBOM (SPDX) | ✅ | — |' >> $GITHUB_STEP_SUMMARY
-          echo '| Cosign Prepare | ✅ | — |' >> $GITHUB_STEP_SUMMARY
-          echo '| Dependency Review | ✅ | — |' >> $GITHUB_STEP_SUMMARY
+          {
+            echo '## Security Pipeline Summary'
+            echo ''
+            echo '| Scan | Status | SARIF Uploaded |'
+            echo '|------|--------|----------------|'
+            echo '| Trivy Filesystem | ✅ | ✅ |'
+            echo '| Trivy Container | ✅ | ✅ |'
+            echo '| Gitleaks | ✅ | ✅ |'
+            echo '| Semgrep | ✅ | ✅ |'
+            echo '| Checkov | ✅ | ✅ |'
+            echo '| SBOM (CycloneDX) | ✅ | — |'
+            echo '| SBOM (SPDX) | ✅ | — |'
+            echo '| Cosign Prepare | ✅ | — |'
+            echo '| Dependency Review | ✅ | — |'
+          } >> "$GITHUB_STEP_SUMMARY"

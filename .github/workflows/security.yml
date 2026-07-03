@@ -129,10 +129,12 @@ jobs:
     steps:
       - name: Generate pipeline summary
         run: |
-          echo '## Security Pipeline Summary' >> $GITHUB_STEP_SUMMARY
-          echo '' >> $GITHUB_STEP_SUMMARY
-          echo '| Job | Status | Artifact |' >> $GITHUB_STEP_SUMMARY
-          echo '|-----|--------|----------|' >> $GITHUB_STEP_SUMMARY
-          echo '| Gitleaks | ✅ | gitleaks-results |' >> $GITHUB_STEP_SUMMARY
-          echo '| Checkov | ✅ | checkov-results |' >> $GITHUB_STEP_SUMMARY
-          echo '| Semgrep | ✅ | semgrep-results |' >> $GITHUB_STEP_SUMMARY
+          {
+            echo '## Security Pipeline Summary'
+            echo ''
+            echo '| Job | Status | Artifact |'
+            echo '|-----|--------|----------|'
+            echo '| Gitleaks | ✅ | gitleaks-results |'
+            echo '| Checkov | ✅ | checkov-results |'
+            echo '| Semgrep | ✅ | semgrep-results |'
+          } >> "$GITHUB_STEP_SUMMARY"

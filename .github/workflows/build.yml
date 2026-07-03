@@ -33,8 +33,8 @@ jobs:
         id: meta
         run: |
           sha_short=$(git rev-parse --short HEAD)
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
+          echo "sha_short=$sha_short" >> "$GITHUB_OUTPUT"
+          echo "timestamp=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
           if [[ '${{ github.ref_type }}' == 'tag' ]]; then
             version='${{ github.ref_name }}'
             version=${version#v}
@@ -43,13 +43,13 @@ jobs:
           else
             version='${{ github.ref_name }}'
           fi
-          echo "version=$version" >> $GITHUB_OUTPUT
-          tags='ghcr.io/aegisai-platform/platform:'$version
-          tags=$tags',ghcr.io/aegisai-platform/platform:sha-'$sha_short
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          tags="ghcr.io/aegisai-platform/platform:$version"
+          tags="$tags,ghcr.io/aegisai-platform/platform:sha-$sha_short"
           if [[ '${{ github.ref_name }}' == 'main' ]]; then
-            tags=$tags',ghcr.io/aegisai-platform/platform:latest'
+            tags="$tags,ghcr.io/aegisai-platform/platform:latest"
           fi
-          echo "tags=$tags" >> $GITHUB_OUTPUT
+          echo "tags=$tags" >> "$GITHUB_OUTPUT"
           echo "version=$version"
           echo "tags=$tags"
 
@@ -117,13 +117,15 @@ jobs:
     steps:
       - name: Generate build summary
         run: |
-          echo '## Build Pipeline Summary' >> $GITHUB_STEP_SUMMARY
-          echo '' >> $GITHUB_STEP_SUMMARY
-          echo '| Item | Value |' >> $GITHUB_STEP_SUMMARY
-          echo '|------|-------|' >> $GITHUB_STEP_SUMMARY
-          echo '| Version | ${{ needs.build.outputs.meta_version }} |' >> $GITHUB_STEP_SUMMARY
-          echo '| Image Tags | ${{ needs.build.outputs.meta_tags }} |' >> $GITHUB_STEP_SUMMARY
-          echo '| Commit | ${{ github.sha }} |' >> $GITHUB_STEP_SUMMARY
-          echo '| Image Artifact | \`image.tar\` (30 day retention) |' >> $GITHUB_STEP_SUMMARY
-          echo '| SBOM (CycloneDX) | \`sbom-cdx.json\` (90 day retention) |' >> $GITHUB_STEP_SUMMARY
-          echo '| SBOM (SPDX) | \`sbom-spdx.json\` (90 day retention) |' >> $GITHUB_STEP_SUMMARY
+          {
+            echo '## Build Pipeline Summary'
+            echo ''
+            echo '| Item | Value |'
+            echo '|------|-------|'
+            echo '| Version | ${{ needs.build.outputs.meta_version }} |'
+            echo '| Image Tags | ${{ needs.build.outputs.meta_tags }} |'
+            echo '| Commit | ${{ github.sha }} |'
+            echo '| Image Artifact | '\`'image.tar'\`' (30 day retention) |'
+            echo '| SBOM (CycloneDX) | '\`'sbom-cdx.json'\`' (90 day retention) |'
+            echo '| SBOM (SPDX) | '\`'sbom-spdx.json'\`' (90 day retention) |'
+          } >> "$GITHUB_STEP_SUMMARY"

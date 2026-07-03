@@ -263,15 +263,17 @@ jobs:
     steps:
       - name: Generate pipeline summary
         run: |
-          echo "## CI Pipeline Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status | Artifact |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|----------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Validate | ✅ | — |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ✅ | — |" >> $GITHUB_STEP_SUMMARY
-          echo "| Test | ✅ | coverage-report |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ✅ | SARIF (Semgrep) |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Scan | ✅ | SARIF (Trivy, Checkov) |" >> $GITHUB_STEP_SUMMARY
-          echo "| SBOM | ✅ | sbom/ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Package | ✅ | dist/ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Artifact | ✅ | All uploaded |" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## CI Pipeline Complete"
+            echo ""
+            echo "| Stage | Status | Artifact |"
+            echo "|-------|--------|----------|"
+            echo "| Validate | ✅ | — |"
+            echo "| Lint | ✅ | — |"
+            echo "| Test | ✅ | coverage-report |"
+            echo "| Security | ✅ | SARIF (Semgrep) |"
+            echo "| Dependency Scan | ✅ | SARIF (Trivy, Checkov) |"
+            echo "| SBOM | ✅ | sbom/ |"
+            echo "| Package | ✅ | dist/ |"
+            echo "| Artifact | ✅ | All uploaded |"
+          } >> "$GITHUB_STEP_SUMMARY"

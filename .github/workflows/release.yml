@@ -268,21 +268,23 @@ jobs:
     steps:
       - name: Generate release summary
         run: |
-          echo "## Release Pipeline Complete" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Tag:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Validate | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Test | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Scan | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| SBOM | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Package | ✅ |" >> $GITHUB_STEP_SUMMARY
-          echo "| Artifact | ✅ |" >> $GITHUB_STEP_SUMMARY
+          {
+            echo "## Release Pipeline Complete"
+            echo ""
+            echo "**Tag:** \`${{ github.ref_name }}\`"
+            echo "**Commit:** \`${{ github.sha }}\`"
+            echo ""
+            echo "| Stage | Status |"
+            echo "|-------|--------|"
+            echo "| Validate | ✅ |"
+            echo "| Lint | ✅ |"
+            echo "| Test | ✅ |"
+            echo "| Security | ✅ |"
+            echo "| Dependency Scan | ✅ |"
+            echo "| SBOM | ✅ |"
+            echo "| Package | ✅ |"
+            echo "| Artifact | ✅ |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   release:
     name: GitHub Release
@@ -311,7 +313,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${{ github.ref_name }}"
-          VERSION="${TAG#v}"
 
           echo "Creating release for $TAG..."
 
