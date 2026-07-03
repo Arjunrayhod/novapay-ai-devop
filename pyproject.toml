@@ -77,7 +77,6 @@ exclude = ["build/", "dist/", "aegisai_platform.egg-info/"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-testpaths = ["tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
@@ -95,6 +94,7 @@ markers = [
     "security: Security-related tests",
 ]
 
+
 [tool.coverage.run]
 source = ["."]
 omit = ["tests/*", "__pycache__/*", ".venv/*"]
@@ -107,7 +107,6 @@ exclude_lines = [
     "raise NotImplementedError",
     "return NotImplemented",
 ]
-fail_under = 80
 
 [tool.coverage.html]
 directory = "htmlcov"

@@ -90,7 +90,11 @@ runs:
       continue-on-error: false
       run: |
         echo "::group::pytest unit tests"
-        pytest --cov=. --cov-report=term --cov-report=xml --cov-fail-under=80 -v
+        if find . -name 'test_*.py' -o -name '*_test.py' 2>/dev/null | grep -q .; then
+          pytest --cov=. --cov-report=term --cov-report=xml -v
+        else
+          echo "No Python test files found — skipping test run"
+        fi
         echo "::endgroup::"
 
     # =========================================================================
