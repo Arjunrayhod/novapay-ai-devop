@@ -1,12 +1,12 @@
 # syntax=docker/dockerfile:1
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 WORKDIR /build
 COPY pyproject.toml .
 RUN pip install --no-cache-dir build
 COPY . .
 RUN python -m build --wheel
 
-FROM python:3.11-slim
+FROM python:3.14-slim
 WORKDIR /app
 COPY --from=builder /build/dist/*.whl /tmp/
 RUN pip install --no-cache-dir /tmp/*.whl && rm /tmp/*.whl
