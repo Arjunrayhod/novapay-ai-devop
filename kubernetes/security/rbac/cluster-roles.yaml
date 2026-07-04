@@ -212,10 +212,56 @@ metadata:
     aegisai.io/rbac-aggregate: namespace-admin
 rules:
   - apiGroups: ['', 'apps', 'batch', 'networking.k8s.io']
-    resources: ['*']
+    resources:
+      - pods
+      - pods/attach
+      - pods/exec
+      - pods/log
+      - pods/portforward
+      - pods/proxy
+      - pods/status
+      - pods/eviction
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - replicationcontrollers/status
+      - services
+      - services/status
+      - services/proxy
+      - endpoints
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+      - configmaps
+      - secrets
+      - serviceaccounts
+      - serviceaccounts/status
+      - events
+      - limitranges
+      - resourcequotas
+      - resourcequotas/status
+      - deployments
+      - deployments/scale
+      - deployments/status
+      - statefulsets
+      - statefulsets/scale
+      - statefulsets/status
+      - daemonsets
+      - daemonsets/status
+      - replicasets
+      - replicasets/scale
+      - replicasets/status
+      - controllerrevisions
+      - jobs
+      - jobs/status
+      - cronjobs
+      - cronjobs/status
+      - ingresses
+      - ingresses/status
+      - networkpolicies
     verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
   - apiGroups: ['autoscaling']
-    resources: ['*']
+    resources:
+      - horizontalpodautoscalers
+      - horizontalpodautoscalers/status
     verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
   - apiGroups: ['policy']
     resources: ['poddisruptionbudgets']
@@ -267,10 +313,50 @@ metadata:
     aegisai.io/rbac-tier: namespace
 rules:
   - apiGroups: ['', 'apps', 'batch', 'networking.k8s.io']
-    resources: ['*']
+    resources:
+      - pods
+      - pods/log
+      - pods/status
+      - pods/eviction
+      - replicationcontrollers
+      - replicationcontrollers/scale
+      - replicationcontrollers/status
+      - services
+      - services/status
+      - endpoints
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+      - configmaps
+      - serviceaccounts
+      - serviceaccounts/status
+      - events
+      - limitranges
+      - resourcequotas
+      - resourcequotas/status
+      - deployments
+      - deployments/scale
+      - deployments/status
+      - statefulsets
+      - statefulsets/scale
+      - statefulsets/status
+      - daemonsets
+      - daemonsets/status
+      - replicasets
+      - replicasets/scale
+      - replicasets/status
+      - controllerrevisions
+      - jobs
+      - jobs/status
+      - cronjobs
+      - cronjobs/status
+      - ingresses
+      - ingresses/status
+      - networkpolicies
     verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
   - apiGroups: ['autoscaling']
-    resources: ['*']
+    resources:
+      - horizontalpodautoscalers
+      - horizontalpodautoscalers/status
     verbs: ['create', 'get', 'list', 'watch', 'update', 'patch', 'delete']
   - apiGroups: ['policy']
     resources: ['poddisruptionbudgets']
@@ -284,10 +370,45 @@ metadata:
     aegisai.io/rbac-tier: namespace
 rules:
   - apiGroups: ['', 'apps', 'batch', 'networking.k8s.io']
-    resources: ['*']
+    resources:
+      - pods
+      - pods/log
+      - pods/status
+      - replicationcontrollers
+      - replicationcontrollers/status
+      - services
+      - services/status
+      - endpoints
+      - persistentvolumeclaims
+      - persistentvolumeclaims/status
+      - configmaps
+      - serviceaccounts
+      - serviceaccounts/status
+      - events
+      - limitranges
+      - resourcequotas
+      - resourcequotas/status
+      - deployments
+      - deployments/status
+      - statefulsets
+      - statefulsets/status
+      - daemonsets
+      - daemonsets/status
+      - replicasets
+      - replicasets/status
+      - controllerrevisions
+      - jobs
+      - jobs/status
+      - cronjobs
+      - cronjobs/status
+      - ingresses
+      - ingresses/status
+      - networkpolicies
     verbs: ['get', 'list', 'watch']
   - apiGroups: ['autoscaling']
-    resources: ['*']
+    resources:
+      - horizontalpodautoscalers
+      - horizontalpodautoscalers/status
     verbs: ['get', 'list', 'watch']
   - apiGroups: ['policy']
     resources: ['poddisruptionbudgets']
