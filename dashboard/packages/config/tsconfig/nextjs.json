@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Next.js",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["${configDir}/src/*"]
+    },
+    "noEmit": true
+  },
+  "include": [
+    "${configDir}/next-env.d.ts",
+    "${configDir}/next.config.ts",
+    "${configDir}/src/**/*.ts",
+    "${configDir}/src/**/*.tsx"
+  ],
+  "exclude": ["${configDir}/node_modules"]
+}

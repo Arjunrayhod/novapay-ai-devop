@@ -1,0 +1,61 @@
+services:
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: aegisai-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - ../.env.example
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+      - PROMETHEUS_URL=http://prometheus:9090
+      - LOKI_URL=http://loki:3100
+      - TEMPO_URL=http://tempo:3200
+    depends_on:
+      redis:
+        condition: service_started
+    networks:
+      - aegisai
+      - lab_network
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    container_name: aegisai-web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - api
+    networks:
+      - aegisai
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: aegisai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aegisai
+    restart: unless-stopped
+
+networks:
+  aegisai:
+    driver: bridge
+  lab_network:
+    external: true
+    name: lab_default
+
+volumes:
+  redis_data:
