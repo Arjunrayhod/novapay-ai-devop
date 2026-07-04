@@ -45,7 +45,7 @@ data:
     querier:
       max_concurrent_queries: 8
       frontend_worker:
-        frontend_address: tempo:9095
+        frontend_address: 127.0.0.1:9095
 
     query_frontend:
       max_outstanding_per_tenant: 100

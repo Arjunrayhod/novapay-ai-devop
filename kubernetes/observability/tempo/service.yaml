@@ -24,9 +24,5 @@ spec:
       port: 4318
       targetPort: 4318
       protocol: TCP
-    - name: http-metrics
-      port: 3200
-      targetPort: 3200
-      protocol: TCP
   selector:
     app.kubernetes.io/name: tempo

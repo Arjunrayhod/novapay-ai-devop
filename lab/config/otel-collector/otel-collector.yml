@@ -34,7 +34,12 @@ processors:
         from_attribute: service.name
         action: upsert
 
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:8889
+
 service:
+  extensions: [health_check]
   pipelines:
     traces:
       receivers: [otlp]
@@ -46,6 +51,6 @@ service:
       exporters: [prometheus]
   telemetry:
     metrics:
-      address: 0.0.0.0:8888
+      address: 0.0.0.0:8887
     logs:
       level: info

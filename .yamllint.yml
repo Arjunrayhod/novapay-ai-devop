@@ -1,11 +1,8 @@
 extends: default
 
 rules:
-  # 80 chars is too restrictive for YAML docs
-  line-length:
-    level: warning
-    max: 120
-    allow-non-breakable-inline-mappings: true
+  # 120 chars is too restrictive for PromQL rules and URLs
+  line-length: disable
 
   # Allow truthy values (not just true/false)
   truthy: disable
