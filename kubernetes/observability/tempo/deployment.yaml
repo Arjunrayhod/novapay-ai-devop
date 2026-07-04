@@ -51,11 +51,11 @@ spec:
               mountPath: /tmp/tempo
           resources:
             requests:
-              cpu: 500m
-              memory: '1Gi'
+              cpu: 100m
+              memory: '256Mi'
             limits:
-              cpu: '4'
-              memory: '4Gi'
+              cpu: '1'
+              memory: '1Gi'
           livenessProbe:
             httpGet:
               path: /ready
@@ -77,9 +77,9 @@ spec:
             httpGet:
               path: /ready
               port: http
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 12
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 30
       volumes:
         - name: config
           configMap:

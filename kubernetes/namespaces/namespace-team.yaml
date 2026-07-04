@@ -39,7 +39,7 @@ metadata:
     pod-security.kubernetes.io/warn: baseline
     aegisai.io/cost-center: paysecure
     aegisai.io/data-classification: sensitive
-    aegisai.io/compliance: pci-dss,soc2
+    aegisai.io/compliance: pci-dss-soc2
     app.kubernetes.io/name: aegisai-team-paysecure
     app.kubernetes.io/component: paysecure
     app.kubernetes.io/part-of: aegisai
@@ -93,7 +93,7 @@ metadata:
     pod-security.kubernetes.io/warn: baseline
     aegisai.io/cost-center: finserv
     aegisai.io/data-classification: sensitive
-    aegisai.io/compliance: pci-dss,soc2,rbi
+    aegisai.io/compliance: pci-dss-soc2-rbi
     app.kubernetes.io/name: aegisai-team-finserv
     app.kubernetes.io/component: finserv
     app.kubernetes.io/part-of: aegisai
