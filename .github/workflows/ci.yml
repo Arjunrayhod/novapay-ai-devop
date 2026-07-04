@@ -225,9 +225,7 @@ jobs:
         run: |
           pip install cyclonedx-bom
           mkdir -p sbom-output
-          if command -v cyclonedx-py &>/dev/null; then
-            pip freeze 2>/dev/null | cyclonedx-py requirements - -o sbom-output/sbom.json
-          elif command -v cyclonedx-bom &>/dev/null; then
+          if command -v cyclonedx-bom &>/dev/null; then
             cyclonedx-bom -o sbom-output/sbom.json
           else
             python scripts/gen-sbom.py sbom-output
