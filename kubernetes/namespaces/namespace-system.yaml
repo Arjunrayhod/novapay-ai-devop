@@ -11,7 +11,7 @@ metadata:
     pod-security.kubernetes.io/warn: privileged
     aegisai.io/cost-center: platform
     aegisai.io/data-classification: restricted
-    aegisai.io/compliance: pci-dss,soc2,rbi
+    aegisai.io/compliance: pci-dss-soc2-rbi
     app.kubernetes.io/name: aegisai-system-security
     app.kubernetes.io/component: security
     app.kubernetes.io/part-of: aegisai
@@ -37,7 +37,7 @@ metadata:
     pod-security.kubernetes.io/warn: privileged
     aegisai.io/cost-center: platform
     aegisai.io/data-classification: restricted
-    aegisai.io/compliance: pci-dss,soc2,rbi
+    aegisai.io/compliance: pci-dss-soc2-rbi
     app.kubernetes.io/name: aegisai-system-istio
     app.kubernetes.io/component: service-mesh
     app.kubernetes.io/part-of: aegisai
@@ -63,7 +63,7 @@ metadata:
     pod-security.kubernetes.io/warn: baseline
     aegisai.io/cost-center: platform
     aegisai.io/data-classification: internal
-    aegisai.io/compliance: pci-dss,soc2
+    aegisai.io/compliance: pci-dss-soc2
     app.kubernetes.io/name: aegisai-system-observability
     app.kubernetes.io/component: observability
     app.kubernetes.io/part-of: aegisai

@@ -25,7 +25,7 @@ spec:
         fsGroup: 65534
       containers:
         - name: prometheus-operator
-          image: docker.io/prom/prometheus-operator:v0.76.0
+          image: quay.io/prometheus-operator/prometheus-operator:v0.76.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -53,7 +53,7 @@ spec:
             failureThreshold: 3
           readinessProbe:
             httpGet:
-              path: /readyz
+              path: /healthz
               port: 8080
             initialDelaySeconds: 15
             periodSeconds: 5

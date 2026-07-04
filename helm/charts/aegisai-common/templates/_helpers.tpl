@@ -69,8 +69,11 @@ Usage: {{ include "aegisai-common.image" . }}
 */}}
 {{- define "aegisai-common.image" -}}
 {{- $registry := .Values.image.registry | default "" }}
-{{- $repository := .Values.image.repository }}
-{{- $tag := .Values.image.tag | default (printf "v%s" .Chart.AppVersion) }}
+{{- $repository := required "aegisai-common: image.repository is required" .Values.image.repository }}
+{{- $tag := .Values.image.tag | default "" }}
+{{- if not $tag }}
+{{- $tag = printf "v%s" .Chart.AppVersion }}
+{{- end }}
 {{- if $registry }}
 {{- printf "%s/%s:%s" $registry $repository $tag }}
 {{- else }}

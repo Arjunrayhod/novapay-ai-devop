@@ -53,6 +53,7 @@ aegisai-common:
       - --kubelet-insecure-tls
       - --cert-dir=/tmp/certs
       - --metric-resolution=15s
+      - --secure-port=10250
     resources:
       requests:
         cpu: 100m
