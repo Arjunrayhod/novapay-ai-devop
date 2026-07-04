@@ -162,11 +162,13 @@ jobs:
         run: |
           checkov \
             --directory . \
-            --framework terraform kubernetes dockerfile \
+            --framework terraform \
+            --framework kubernetes \
+            --framework dockerfile \
             --output sarif \
-            --output-file-path . \
+            --output-file-path results_sarif.sarif \
             --compact \
-            --skip-check 'CKV_SECRET_*'
+            --skip-check CKV_SECRET_*
       - name: Upload Checkov SARIF artifact
         if: always() && hashFiles('results_sarif.sarif') != ''
         uses: actions/upload-artifact@v4

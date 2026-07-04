@@ -189,9 +189,11 @@ jobs:
         run: |
           checkov \
             --directory . \
-            --framework terraform kubernetes dockerfile \
+            --framework terraform \
+            --framework kubernetes \
+            --framework dockerfile \
             --output sarif \
-            --output-file-path . \
+            --output-file-path results_sarif.sarif \
             --compact
 
       - name: Upload Checkov SARIF
