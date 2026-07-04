@@ -229,15 +229,10 @@ runs:
       run: |
         echo "::group::SBOM generation"
         mkdir -p sbom-output
-        if command -v cyclonedx-py &>/dev/null; then
-          pip freeze 2>/dev/null | cyclonedx-py requirements - -o sbom-output/sbom.json 2>&1 || \
+        if command -v cyclonedx-bom &>/dev/null; then
           cyclonedx-bom -o sbom-output/sbom.json 2>&1
-        elif [ -f requirements.txt ]; then
-          pip list --format=json | python3 -c "
-import json, sys
-data = json.load(sys.stdin)
-sbom = {'bomFormat': 'CycloneDX', 'specVersion': '1.5', 'version': 1, 'metadata': {'timestamp': '$(date -u +%Y-%m-%dT%H:%M:%SZ)', 'tools': [{'name': 'pip-list'}], 'component': {'name': 'aegisai-platform', 'type': 'application'}}, 'components': [{'type': 'library', 'name': p['name'], 'version': p['version'], 'purl': f'pkg:pypi/{p[\"name\"]}@{p[\"version\"]}'} for p in data]}
-json.dump(sbom, sys.stdout, indent=2)" > sbom-output/sbom.json 2>&1
+        else
+          python scripts/gen-sbom.py sbom-output 2>&1
         fi
         if [ -f sbom-output/sbom.json ]; then
           echo "SBOM generated: $(wc -c < sbom-output/sbom.json) bytes"

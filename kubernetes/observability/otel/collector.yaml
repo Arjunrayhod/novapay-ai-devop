@@ -32,7 +32,7 @@ spec:
           image: docker.io/otel/opentelemetry-collector-contrib:0.108.0
           imagePullPolicy: IfNotPresent
           args:
-            - --config=/etc/otel/config.yaml
+            - --config=/etc/otel/otel-collector-config.yaml
           ports:
             - name: otlp-grpc
               containerPort: 4317

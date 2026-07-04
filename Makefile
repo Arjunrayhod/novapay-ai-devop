@@ -1,4 +1,4 @@
-.PHONY: help setup init lint format typecheck test build clean precommit lab-up lab-down lab-status lab-validate
+.PHONY: help setup init lint format typecheck test build clean validate precommit lab-up lab-down lab-status lab-validate
 
 SHELL := /bin/bash
 
@@ -17,6 +17,10 @@ typecheck: ## Run mypy type checker (strict mode)
 
 test: ## Run pytest with coverage
 	pytest --cov=. --cov-fail-under=80 -v
+
+validate: ## Run full local validation (mirrors GitHub Actions pipeline)
+	@echo "==> Running AegisAI Local Validation..."
+	@scripts/validate.ps1
 
 precommit: ## Run all pre-commit hooks
 	pre-commit run --all-files

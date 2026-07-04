@@ -5,9 +5,9 @@ metadata:
   annotations:
     aegisai.io/description: 'Common annotation set inherited from Terraform governance tags'
 data:
-  aegisai.io/environment: production
-  aegisai.io/owner: platform-engineering
-  aegisai.io/cost-center: platform
-  aegisai.io/data-classification: internal
-  aegisai.io/compliance-frameworks: pci-dss,soc2,rbi
-  aegisai.io/terraform-module: terraform/modules/governance
+  aegisai.io.environment: production
+  aegisai.io.owner: platform-engineering
+  aegisai.io.cost-center: platform
+  aegisai.io.data-classification: internal
+  aegisai.io.compliance-frameworks: pci-dss-soc2-rbi
+  aegisai.io.terraform-module: terraform/modules/governance

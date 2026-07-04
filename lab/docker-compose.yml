@@ -40,7 +40,7 @@ services:
           - registry.aegisai.local
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:5000/v2/']
+      test: ['CMD', 'wget', '-qO-', 'http://localhost:5000/v2/']
       interval: 10s
       timeout: 5s
       retries: 3
@@ -106,7 +106,7 @@ services:
   # MinIO (S3-compatible object storage)
   # ==========================================================================
   minio:
-    image: minio/minio:RELEASE.2024-06-13T22-53-53Z
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
     container_name: aegisai-minio
     hostname: minio.aegisai.local
     ports:
@@ -135,7 +135,7 @@ services:
   # MinIO Bucket Initializer
   # ==========================================================================
   minio-init:
-    image: minio/mc:RELEASE.2024-06-13T22-53-53Z
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
     container_name: aegisai-minio-init
     depends_on:
       minio:
@@ -174,11 +174,15 @@ services:
           - vault.aegisai.local
     restart: unless-stopped
     healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8200/v1/sys/health']
+      test:
+        [
+          "CMD-SHELL",
+          "wget -qO- 'http://127.0.0.1:8200/v1/sys/health?standbyok=true&sealedcode=200&uninitcode=200' >/dev/null || exit 1"
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
+      start_period: 20s
 
   # ==========================================================================
   # Vault Bootstrap
@@ -332,8 +336,6 @@ services:
     container_name: aegisai-otel-collector
     hostname: otel.aegisai.local
     ports:
-      - '4317:4317'   # OTLP gRPC
-      - '4318:4318'   # OTLP HTTP
       - '8888:8888'   # Prometheus metrics
       - '8889:8889'   # Health check
     volumes:
@@ -350,9 +352,3 @@ services:
         condition: service_healthy
       loki:
         condition: service_healthy
-    healthcheck:
-      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:8889/health']
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
