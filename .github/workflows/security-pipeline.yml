@@ -157,6 +157,11 @@ jobs:
           cache: pip
       - name: Install Checkov
         run: pip install checkov
+      - name: Show Checkov version
+        run: |
+          checkov --version
+          which checkov
+
       - name: Run Checkov IaC scan
         continue-on-error: true
         run: |
