@@ -4,15 +4,13 @@
 
 set -e
 
-MC_HOST="http://${MINIO_ROOT_USER}:${MINIO_ROOT_PASSWORD}@${MINIO_ENDPOINT}"
-
 echo "Connecting to MinIO at ${MINIO_ENDPOINT}..."
 
 # Wait for MinIO to be ready
 sleep 2
 
 # Configure alias
-mc alias set local "${MC_HOST}"
+mc alias set local "http://${MINIO_ENDPOINT}" "${MINIO_ROOT_USER}" "${MINIO_ROOT_PASSWORD}"
 
 # Create buckets
 buckets="aegisai-platform aegisai-logs aegisai-backups aegisai-artifacts aegisai-tfstate"
