@@ -25,7 +25,7 @@ priorityClassName: ''
 # ---------------------------------------------------------------------------
 image:
   # registry: docker.io  # optional; omit for default Docker Hub or ECR
-  repository: ''  # REQUIRED — must be overridden by consumer chart (e.g., myrepo/my-app)
+  repository: 'nginx'  # default for testing; override in consumer chart
   tag: ''  # defaults to v{Chart.AppVersion} when empty
   pullPolicy: IfNotPresent
   pullSecrets: []
