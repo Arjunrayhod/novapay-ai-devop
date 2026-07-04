@@ -57,7 +57,7 @@ jobs:
           severity: CRITICAL
       - name: Upload Trivy SARIF artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.sarif-name }}
           path: ${{ matrix.sarif-name }}.sarif
@@ -94,7 +94,7 @@ jobs:
             --verbose
       - name: Upload Gitleaks SARIF artifact
         if: always() && hashFiles('gitleaks.sarif') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gitleaks
           path: gitleaks.sarif
@@ -131,7 +131,7 @@ jobs:
             .
       - name: Upload Semgrep SARIF artifact
         if: always() && hashFiles('semgrep.sarif') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: semgrep
           path: semgrep.sarif
@@ -171,7 +171,7 @@ jobs:
             --skip-check CKV_SECRET_*
       - name: Upload Checkov SARIF artifact
         if: always() && hashFiles('results_sarif.sarif') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: checkov
           path: results_sarif.sarif
@@ -210,7 +210,7 @@ jobs:
           output-file: ${{ matrix.filename }}
           upload-artifact: false
       - name: Upload ${{ matrix.format }} SBOM artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom-${{ matrix.format }}
           path: ${{ matrix.filename }}

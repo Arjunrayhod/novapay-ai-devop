@@ -91,7 +91,7 @@ jobs:
           upload-artifact: false
 
       - name: Upload image artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: image
           path: /tmp/image.tar
@@ -99,7 +99,7 @@ jobs:
           overwrite: true
 
       - name: Upload SBOM artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom
           path: |
