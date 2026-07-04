@@ -230,7 +230,7 @@ runs:
         echo "::group::SBOM generation"
         mkdir -p sbom-output
         if command -v cyclonedx-py &>/dev/null; then
-          cyclonedx-py --format json --output sbom-output/sbom.json 2>&1 || \
+          pip freeze 2>/dev/null | cyclonedx-py requirements - -o sbom-output/sbom.json 2>&1 || \
           cyclonedx-bom -o sbom-output/sbom.json 2>&1
         elif [ -f requirements.txt ]; then
           pip list --format=json | python3 -c "
