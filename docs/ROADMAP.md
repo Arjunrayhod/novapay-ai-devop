@@ -24,6 +24,13 @@ A unified Enterprise DevSecOps Control Center that provides full-spectrum visibi
 | Sprint | Version | Module | Status |
 |---|---|---|---|
 | Sprint 8 | v0.8.0 | Documentation Standard | **Completed** |
+| Sprint 9 | v0.9.0 | Security Center | **Completed** |
+
+## Current Sprint
+
+| Sprint | Version | Module | Status |
+|---|---|---|---|
+| Sprint 10 | v0.10.0 | AI Center | **In Progress** |
 
 ## Planned Sprints
 

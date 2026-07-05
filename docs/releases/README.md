@@ -4,6 +4,7 @@ Index of all release notes for the AegisAI Enterprise DevSecOps Control Center.
 
 | Version | Date | Description |
 |---|---|---|
+| [v0.9.0](v0.9.0-security.md) | 2026-07-05 | Security Center |
 | [v0.7.0](v0.7.0-observability.md) | 2026-07-05 | Observability Control Center |
 | [v0.6.1](v0.6.1-terraform.md) | 2026-06-15 | Terraform Control Center |
 | [v0.6.0](v0.6.0-helm.md) | 2026-06-01 | Helm Center |

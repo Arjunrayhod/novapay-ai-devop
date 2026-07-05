@@ -9,10 +9,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Planned
 
-- Security Center — SAST, dependency scanning, policy enforcement
 - AI Center — ML-powered insights, anomaly detection
 - CI/CD Pipeline Manager — GitHub Actions integration, pipeline monitoring
 - Settings & Configuration — User preferences, theme customization
+
+## [0.9.0] — 2026-07-05
+
+### Added
+
+- Security Center module with 8 read-only API endpoints
+- SAST scanning via built-in Python AST analyzer with optional bandit integration
+- Dependency audit parsing requirements.txt, pyproject.toml, and package.json
+- Built-in vulnerability database covering 14+ popular packages
+- OPA policy discovery and evaluation (when opa CLI is available)
+- Trivy vulnerability scanning integration (when trivy CLI is available)
+- Compliance reporting with score calculation across 4 frameworks
+- Frontend Security Center page with 6 components
+- AI Insights panel with rule-based security recommendations
+- Cached CLI availability checks via `_check_cli()` lazy singleton
+
+### Architecture
+
+- Security toolkit pattern: built-in analysis + optional CLI tools (bandit, safety, trivy, opa)
+- SAST uses Python `ast` module for zero-dependency scanning
+- `_run_cli()` utility (consistent with Terraform/Helm subprocess pattern)
+- `_check_cli()` lazy singleton cache for tool availability
+- Existing `routes/security.py` stubs left untouched (501 Not Implemented)
+
+### Validation
+
+- Ruff: 0 errors
+- TypeScript typecheck: 0 errors
 
 ## [0.7.0] — 2026-07-05
 
@@ -156,7 +183,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[unreleased]: https://github.com/aegisai/dashboard/compare/v0.7.0...HEAD
+[unreleased]: https://github.com/aegisai/dashboard/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/aegisai/dashboard/releases/tag/v0.9.0
 [0.7.0]: https://github.com/aegisai/dashboard/releases/tag/v0.7.0
 [0.6.1]: https://github.com/aegisai/dashboard/releases/tag/v0.6.1
 [0.6.0]: https://github.com/aegisai/dashboard/releases/tag/v0.6.0
