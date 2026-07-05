@@ -51,6 +51,7 @@ app.include_router(
 app.include_router(docker_module_router, prefix="/api/docker", tags=["docker-module"])
 app.include_router(kubernetes_module_router, prefix="/api/kubernetes", tags=["kubernetes-module"])
 app.include_router(helm_module_router, prefix="/api/helm", tags=["helm-module"])
+app.include_router(terraform_module_router, prefix="/api/terraform", tags=["terraform-module"])
 
 
 @app.get("/api/health")

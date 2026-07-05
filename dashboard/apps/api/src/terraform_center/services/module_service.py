@@ -10,7 +10,6 @@ def list_modules() -> list[dict]:
         values = data.get("values", {})
         root = values.get("root_module", {})
         child_modules = root.get("child_modules", [])
-        root_resources = root.get("resources", [])
 
         modules = []
         for m in child_modules:
