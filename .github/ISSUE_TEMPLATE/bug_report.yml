@@ -1,0 +1,104 @@
+name: Bug Report
+description: Report a bug in the AegisAI Control Center
+title: "[Bug]: "
+labels: ["bug", "triage"]
+projects: ["aegisai/1"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report.
+        Please check [existing issues](https://github.com/aegisai/dashboard/issues) first.
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      description: Which module is affected?
+      options:
+        - Environment
+        - Docker Engine
+        - Kubernetes
+        - Helm
+        - Terraform
+        - Observability
+        - Security
+        - AI
+        - UI / Design System
+        - API Core
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: What version of the software are you running?
+      placeholder: "e.g., v0.7.0"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened and what did you expect to happen?
+      placeholder: "When I click X, Y happens instead of Z."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce the issue?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Copy and paste any relevant log output. This will be auto-formatted.
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: |
+        Examples:
+          - **OS**: Windows 11 / Ubuntu 22.04
+          - **Browser**: Chrome 120 / Firefox 121
+          - **Python**: 3.12
+          - **Node**: 22
+          - **Docker**: 27.0
+          - **Kubernetes**: 1.30
+      value: |
+        - OS:
+        - Browser:
+        - Python:
+        - Node:
+        - Docker:
+        - Kubernetes:
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I have searched for existing issues
+          required: true
+        - label: I have included all relevant logs and environment info
+          required: false
+        - label: This is not a security vulnerability (report to security@aegisai.internal)
+          required: true
