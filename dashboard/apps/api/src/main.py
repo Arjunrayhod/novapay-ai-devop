@@ -18,6 +18,8 @@ from .docker_engine.router import router as docker_module_router
 from .k8s.router import router as kubernetes_module_router
 from .helm_center.router import router as helm_module_router
 from .terraform_center.router import router as terraform_module_router
+from .observability.router import router as observability_module_router
+from .security_center.router import router as security_module_router
 from .settings import settings
 
 app = FastAPI(
@@ -52,6 +54,10 @@ app.include_router(docker_module_router, prefix="/api/docker", tags=["docker-mod
 app.include_router(kubernetes_module_router, prefix="/api/kubernetes", tags=["kubernetes-module"])
 app.include_router(helm_module_router, prefix="/api/helm", tags=["helm-module"])
 app.include_router(terraform_module_router, prefix="/api/terraform", tags=["terraform-module"])
+app.include_router(
+    observability_module_router, prefix="/api/observability", tags=["observability-module"]
+)
+app.include_router(security_module_router, prefix="/api/security", tags=["security-module"])
 
 
 @app.get("/api/health")

@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "AegisAI API"
-    VERSION: str = "0.1.0"
+    VERSION: str = "0.9.0"
     DEBUG: bool = False
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
