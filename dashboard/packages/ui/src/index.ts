@@ -26,3 +26,14 @@ export * from './components/custom/status-badge';
 export * from './components/custom/loading';
 export * from './components/custom/search';
 export * from './components/custom/notification';
+export * from './components/custom/dashboard-layout';
+export * from './components/custom/page-container';
+export * from './components/custom/section-header';
+export * from './components/custom/page-header';
+export * from './components/custom/empty-state';
+export * from './components/custom/loading-card';
+export * from './components/custom/environment-badge';
+export * from './components/custom/infrastructure-placeholder';
+export * from './components/custom/ai-status-card';
+
+export * from './providers/theme-provider';

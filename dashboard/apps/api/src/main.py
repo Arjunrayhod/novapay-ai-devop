@@ -13,6 +13,9 @@ from .routes import (
     ai,
     environment,
 )
+from .environment.router import router as environment_module_router
+from .docker_engine.router import router as docker_module_router
+from .k8s.router import router as kubernetes_module_router
 from .settings import settings
 
 app = FastAPI(
@@ -40,6 +43,11 @@ app.include_router(security.router, prefix="/api/v1/security", tags=["security"]
 app.include_router(system.router, prefix="/api/v1/system", tags=["system"])
 app.include_router(ai.router, prefix="/api/v1/ai", tags=["ai"])
 app.include_router(environment.router, prefix="/api/v1/environment", tags=["environment"])
+app.include_router(
+    environment_module_router, prefix="/api/environment", tags=["environment-module"]
+)
+app.include_router(docker_module_router, prefix="/api/docker", tags=["docker-module"])
+app.include_router(kubernetes_module_router, prefix="/api/kubernetes", tags=["kubernetes-module"])
 
 
 @app.get("/api/health")
