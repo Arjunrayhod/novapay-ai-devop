@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardLayout, PageContainer, PageHeader, SectionHeader, Grid } from '@aegisai/ui';
+import { DashboardLayout, PageContainer, PageHeader, SectionHeader, Grid, SystemConsentDialog, getSystemConsent, setSystemConsent } from '@aegisai/ui';
 import { useFullEnvironmentScan } from '../hooks/use-environment';
 import { EnvironmentSummaryCard } from '../components/environment-summary-card';
 import { SystemInfoCard } from '../components/system-info-card';
@@ -9,16 +9,34 @@ import { ValidationResults } from '../components/validation-results';
 import { HealthScoreCard } from '../components/health-score-card';
 import { RecommendationCard } from '../components/recommendation-card';
 import { QuickActionsPanel } from '../components/quick-actions-panel';
-import { useCallback, useRef } from 'react';
+import { fetchReport } from '../services/environment-api';
+import { Shield } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function EnvironmentCenterPage() {
-  const { system, tools, validation, health, isLoading, refetch } = useFullEnvironmentScan();
+  const [consent, setConsent] = useState<'pending' | 'allowed' | 'denied'>('pending');
+
+  useEffect(() => {
+    const saved = getSystemConsent();
+    if (saved === true) setConsent('allowed');
+    else if (saved === false) setConsent('denied');
+  }, []);
+  const { system, tools, validation, health, isLoading, refetch } = useFullEnvironmentScan(consent === 'allowed');
   const reportRef = useRef<HTMLDivElement>(null);
+
+  const handleAllow = useCallback(() => {
+    setSystemConsent(true);
+    setConsent('allowed');
+  }, []);
+
+  const handleDeny = useCallback(() => {
+    setSystemConsent(false);
+    setConsent('denied');
+  }, []);
 
   const handleExport = useCallback(async () => {
     try {
-      const response = await fetch('/api/environment/report');
-      const data = await response.json();
+      const data = await fetchReport();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -33,8 +51,7 @@ export function EnvironmentCenterPage() {
 
   const handleCopy = useCallback(async () => {
     try {
-      const response = await fetch('/api/environment/report');
-      const data = await response.json();
+      const data = await fetchReport();
       await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
     } catch {
       // silently fail
@@ -44,6 +61,36 @@ export function EnvironmentCenterPage() {
   const handleScan = useCallback(() => {
     refetch();
   }, [refetch]);
+
+  if (consent === 'pending') {
+    return <SystemConsentDialog onAllow={handleAllow} onDeny={handleDeny} />;
+  }
+
+  if (consent === 'denied') {
+    return (
+      <DashboardLayout activeItem="environment">
+        <PageContainer>
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: 'var(--color-hover-bg)' }}>
+              <Shield className="h-8 w-8 text-neutral-400" />
+            </div>
+            <h2 className="mt-4 text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>System Access Denied</h2>
+            <p className="mt-2 max-w-md text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+              You denied system information access. The Environment Center cannot show your system data.
+              To re-enable, clear your browser data for this site or click below.
+            </p>
+            <button
+              onClick={handleAllow}
+              className="mt-6 rounded-lg px-6 py-2.5 text-sm font-bold text-white shadow-lg transition-all hover:opacity-90"
+              style={{ backgroundColor: 'var(--color-primary-500)' }}
+            >
+              Enable Access
+            </button>
+          </div>
+        </PageContainer>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout activeItem="environment">

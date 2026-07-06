@@ -25,9 +25,11 @@
   "devDependencies": {
     "@aegisai/config": "workspace:*",
     "@eslint/eslintrc": "^3.0.0",
+    "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "postcss-import": "^16.1.1",
     "typescript": "^5.6.0"
   }
 }

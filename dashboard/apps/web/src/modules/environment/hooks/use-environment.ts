@@ -3,51 +3,56 @@
 import { useQuery } from '@tanstack/react-query';
 import * as envApi from '../services/environment-api';
 
-export function useSystemInfo() {
+export function useSystemInfo(enabled?: boolean) {
   return useQuery({
     queryKey: ['environment', 'system'],
     queryFn: envApi.fetchSystemInfo,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
+    enabled,
   });
 }
 
-export function useTools() {
+export function useTools(enabled?: boolean) {
   return useQuery({
     queryKey: ['environment', 'tools'],
     queryFn: envApi.fetchTools,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
+    enabled,
   });
 }
 
-export function useValidation() {
+export function useValidation(enabled?: boolean) {
   return useQuery({
     queryKey: ['environment', 'validation'],
     queryFn: envApi.fetchValidation,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
+    enabled,
   });
 }
 
-export function useHealth() {
+export function useHealth(enabled?: boolean) {
   return useQuery({
     queryKey: ['environment', 'health'],
     queryFn: envApi.fetchHealth,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
+    enabled,
   });
 }
 
-export function useReport() {
+export function useReport(enabled?: boolean) {
   return useQuery({
     queryKey: ['environment', 'report'],
     queryFn: envApi.fetchReport,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
+    enabled,
   });
 }
 
-export function useFullEnvironmentScan() {
-  const systemQuery = useSystemInfo();
-  const toolsQuery = useTools();
-  const validationQuery = useValidation();
-  const healthQuery = useHealth();
+export function useFullEnvironmentScan(enabled?: boolean) {
+  const systemQuery = useSystemInfo(enabled);
+  const toolsQuery = useTools(enabled);
+  const validationQuery = useValidation(enabled);
+  const healthQuery = useHealth(enabled);
 
   const isLoading = systemQuery.isLoading || toolsQuery.isLoading || validationQuery.isLoading || healthQuery.isLoading;
   const isError = systemQuery.isError || toolsQuery.isError || validationQuery.isError || healthQuery.isError;

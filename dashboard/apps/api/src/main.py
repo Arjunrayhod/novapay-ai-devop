@@ -1,7 +1,18 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .ai_center.router import router as ai_module_router
+from .database import init_db
+from .dev_experience.router import router as dev_experience_module_router
+from .docker_engine.router import router as docker_module_router
+from .environment.router import router as environment_module_router
+from .helm_center.router import router as helm_module_router
+from .k8s.router import router as kubernetes_module_router
+from .observability.router import router as observability_module_router
 from .routes import (
+    auth,
     docker,
     kubernetes,
     terraform,
@@ -13,20 +24,23 @@ from .routes import (
     ai,
     environment,
 )
-from .environment.router import router as environment_module_router
-from .docker_engine.router import router as docker_module_router
-from .k8s.router import router as kubernetes_module_router
-from .helm_center.router import router as helm_module_router
-from .terraform_center.router import router as terraform_module_router
-from .observability.router import router as observability_module_router
 from .security_center.router import router as security_module_router
 from .settings import settings
+from .terraform_center.router import router as terraform_module_router
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -37,6 +51,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(docker.router, prefix="/api/v1/docker", tags=["docker"])
 app.include_router(kubernetes.router, prefix="/api/v1/kubernetes", tags=["kubernetes"])
 app.include_router(terraform.router, prefix="/api/v1/terraform", tags=["terraform"])
@@ -58,6 +73,10 @@ app.include_router(
     observability_module_router, prefix="/api/observability", tags=["observability-module"]
 )
 app.include_router(security_module_router, prefix="/api/security", tags=["security-module"])
+app.include_router(ai_module_router, prefix="/api/ai", tags=["ai-module"])
+app.include_router(
+    dev_experience_module_router, prefix="/api/dev-experience", tags=["dev-experience-module"]
+)
 
 
 @app.get("/api/health")

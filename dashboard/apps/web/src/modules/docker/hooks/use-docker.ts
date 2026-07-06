@@ -9,7 +9,7 @@ export function useDockerInfo() {
   return useQuery({
     queryKey: ['docker', 'info'],
     queryFn: dockerApi.fetchDockerInfo,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -17,7 +17,7 @@ export function useDockerVersion() {
   return useQuery({
     queryKey: ['docker', 'version'],
     queryFn: dockerApi.fetchDockerVersion,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -33,7 +33,7 @@ export function useImages() {
   return useQuery({
     queryKey: ['docker', 'images'],
     queryFn: dockerApi.fetchImages,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -41,7 +41,7 @@ export function useNetworks() {
   return useQuery({
     queryKey: ['docker', 'networks'],
     queryFn: dockerApi.fetchNetworks,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -49,7 +49,7 @@ export function useVolumes() {
   return useQuery({
     queryKey: ['docker', 'volumes'],
     queryFn: dockerApi.fetchVolumes,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -57,7 +57,7 @@ export function useStats() {
   return useQuery({
     queryKey: ['docker', 'stats'],
     queryFn: dockerApi.fetchStats,
-    refetchInterval: 2_000,
+    refetchInterval: 10_000,
   });
 }
 

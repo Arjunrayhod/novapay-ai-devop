@@ -12,15 +12,15 @@ interface StatusBadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variantStyles: Record<StatusVariant, string> = {
   success:
-    'bg-success-50 text-success-900 dark:bg-success-900/20 dark:text-success-400',
+    'bg-success-500/10 text-success-400 border border-success-500/20',
   warning:
-    'bg-warning-50 text-warning-900 dark:bg-warning-900/20 dark:text-warning-400',
+    'bg-warning-500/10 text-warning-400 border border-warning-500/20',
   danger:
-    'bg-danger-50 text-danger-900 dark:bg-danger-900/20 dark:text-danger-400',
+    'bg-danger-500/10 text-danger-400 border border-danger-500/20',
   info:
-    'bg-primary-50 text-primary-900 dark:bg-primary-900/20 dark:text-primary-400',
+    'bg-primary-500/10 text-primary-400 border border-primary-500/20',
   neutral:
-    'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300',
+    'text-neutral-400 border',
 };
 
 const dotStyles: Record<StatusVariant, string> = {

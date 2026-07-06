@@ -44,5 +44,6 @@ export async function fetchStats(): Promise<ContainerStats[]> {
 }
 
 export function createEventSource(): EventSource {
-  return new EventSource(`http://localhost:8000${BASE}/events`);
+  const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  return new EventSource(`${base}${BASE}/events`);
 }

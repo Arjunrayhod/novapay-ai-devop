@@ -11,11 +11,11 @@ export function SectionHeader({ title, description, action, className }: Section
   return (
     <div className={cn('flex items-start justify-between gap-4', className)}>
       <div className="space-y-0.5">
-        <h2 className="text-base font-semibold tracking-tight text-neutral-900 dark:text-neutral-50">
+        <h2 className="text-base font-semibold tracking-tight" style={{ color: 'var(--color-text-primary)' }}>
           {title}
         </h2>
         {description && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">{description}</p>
+          <p className="text-sm text-neutral-400">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

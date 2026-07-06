@@ -33,7 +33,10 @@ export * from './components/custom/page-header';
 export * from './components/custom/empty-state';
 export * from './components/custom/loading-card';
 export * from './components/custom/environment-badge';
-export * from './components/custom/infrastructure-placeholder';
+export * from './components/custom/hero-banner';
 export * from './components/custom/ai-status-card';
+export * from './components/custom/topology-view';
+export { InfrastructurePlaceholder } from './components/custom/infrastructure-placeholder';
+export { SystemConsentDialog, getSystemConsent, setSystemConsent } from './components/custom/system-consent';
 
 export * from './providers/theme-provider';

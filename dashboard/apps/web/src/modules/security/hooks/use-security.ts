@@ -8,7 +8,7 @@ export function useSecurityHealth() {
   return useQuery({
     queryKey: ['security', 'health'],
     queryFn: securityApi.fetchSecurityHealth,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -16,7 +16,7 @@ export function useSecurityOverview() {
   return useQuery({
     queryKey: ['security', 'overview'],
     queryFn: securityApi.fetchSecurityOverview,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -24,7 +24,7 @@ export function useSastScan(target = '') {
   return useQuery({
     queryKey: ['security', 'sast', 'scan', target],
     queryFn: () => securityApi.fetchSastScan(target),
-    refetchInterval: 60_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -32,7 +32,7 @@ export function useDependencyAudit() {
   return useQuery({
     queryKey: ['security', 'dependencies'],
     queryFn: securityApi.fetchDependencyAudit,
-    refetchInterval: 60_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -40,7 +40,7 @@ export function useVulnerabilitySummary() {
   return useQuery({
     queryKey: ['security', 'vulnerabilities'],
     queryFn: securityApi.fetchVulnerabilitySummary,
-    refetchInterval: 60_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -48,7 +48,7 @@ export function usePolicies() {
   return useQuery({
     queryKey: ['security', 'policies'],
     queryFn: securityApi.fetchPolicies,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -56,7 +56,7 @@ export function usePolicyEvaluation() {
   return useQuery({
     queryKey: ['security', 'policies', 'evaluate'],
     queryFn: securityApi.fetchPolicyEvaluation,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -64,7 +64,7 @@ export function useComplianceReport() {
   return useQuery({
     queryKey: ['security', 'compliance'],
     queryFn: securityApi.fetchComplianceReport,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 

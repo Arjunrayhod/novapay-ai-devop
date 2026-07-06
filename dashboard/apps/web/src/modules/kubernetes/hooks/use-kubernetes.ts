@@ -8,7 +8,7 @@ export function useKubernetesVersion() {
   return useQuery({
     queryKey: ['kubernetes', 'version'],
     queryFn: k8sApi.fetchVersion,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -16,7 +16,7 @@ export function useKubernetesCluster() {
   return useQuery({
     queryKey: ['kubernetes', 'cluster'],
     queryFn: k8sApi.fetchCluster,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -24,7 +24,7 @@ export function useKubernetesHealth() {
   return useQuery({
     queryKey: ['kubernetes', 'health'],
     queryFn: k8sApi.fetchHealth,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -32,7 +32,7 @@ export function useNodes() {
   return useQuery({
     queryKey: ['kubernetes', 'nodes'],
     queryFn: k8sApi.fetchNodes,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -40,7 +40,7 @@ export function useNamespaces() {
   return useQuery({
     queryKey: ['kubernetes', 'namespaces'],
     queryFn: k8sApi.fetchNamespaces,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -48,7 +48,7 @@ export function usePods(namespace?: string) {
   return useQuery({
     queryKey: ['kubernetes', 'pods', namespace],
     queryFn: () => k8sApi.fetchPods(namespace),
-    refetchInterval: 5_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -80,7 +80,7 @@ export function useServices(namespace?: string) {
   return useQuery({
     queryKey: ['kubernetes', 'services', namespace],
     queryFn: () => k8sApi.fetchServices(namespace),
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -88,7 +88,7 @@ export function useIngresses(namespace?: string) {
   return useQuery({
     queryKey: ['kubernetes', 'ingress', namespace],
     queryFn: () => k8sApi.fetchIngresses(namespace),
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -96,7 +96,7 @@ export function usePersistentVolumes() {
   return useQuery({
     queryKey: ['kubernetes', 'persistentvolumes'],
     queryFn: k8sApi.fetchPersistentVolumes,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -104,7 +104,7 @@ export function usePersistentVolumeClaims(namespace?: string) {
   return useQuery({
     queryKey: ['kubernetes', 'persistentvolumeclaims', namespace],
     queryFn: () => k8sApi.fetchPersistentVolumeClaims(namespace),
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 

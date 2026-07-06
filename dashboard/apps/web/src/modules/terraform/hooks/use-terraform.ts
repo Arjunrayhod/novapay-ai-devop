@@ -8,7 +8,7 @@ export function useTerraformVersion() {
   return useQuery({
     queryKey: ['terraform', 'version'],
     queryFn: terraformApi.fetchTerraformVersion,
-    refetchOnWindowFocus: false,
+    refetchInterval: 10_000,
   });
 }
 
@@ -16,7 +16,7 @@ export function useTerraformState() {
   return useQuery({
     queryKey: ['terraform', 'state'],
     queryFn: terraformApi.fetchTerraformState,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -24,7 +24,7 @@ export function useTerraformModules() {
   return useQuery({
     queryKey: ['terraform', 'modules'],
     queryFn: terraformApi.fetchTerraformModules,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -32,7 +32,7 @@ export function useTerraformResources() {
   return useQuery({
     queryKey: ['terraform', 'resources'],
     queryFn: terraformApi.fetchTerraformResources,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -40,7 +40,7 @@ export function useTerraformProviders() {
   return useQuery({
     queryKey: ['terraform', 'providers'],
     queryFn: terraformApi.fetchTerraformProviders,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -48,7 +48,7 @@ export function useTerraformOutputs() {
   return useQuery({
     queryKey: ['terraform', 'outputs'],
     queryFn: terraformApi.fetchTerraformOutputs,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -56,7 +56,7 @@ export function useTerraformPlan() {
   return useQuery({
     queryKey: ['terraform', 'plan'],
     queryFn: terraformApi.fetchTerraformPlan,
-    refetchInterval: 30_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -64,7 +64,7 @@ export function useTerraformHealth() {
   return useQuery({
     queryKey: ['terraform', 'health'],
     queryFn: terraformApi.fetchTerraformHealth,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 
@@ -72,7 +72,7 @@ export function useTerraformOverviewData() {
   return useQuery({
     queryKey: ['terraform', 'overview'],
     queryFn: terraformApi.fetchTerraformOverview,
-    refetchInterval: 15_000,
+    refetchInterval: 10_000,
   });
 }
 

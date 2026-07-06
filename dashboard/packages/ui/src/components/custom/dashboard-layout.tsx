@@ -1,9 +1,28 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { cn } from '../../lib/utils';
 import { Sidebar } from './sidebar';
 import { Navbar } from './navbar';
+
+const NAV_ROUTES: Record<string, string> = {
+  dashboard: '/',
+  environment: '/environment',
+  'dev-experience': '/dev-experience',
+  docker: '/docker',
+  kubernetes: '/kubernetes',
+  helm: '/helm',
+  terraform: '/terraform',
+  github: '/github',
+  security: '/security',
+  monitoring: '/observability',
+  logs: '/observability',
+  registry: '/registry',
+  vault: '/vault',
+  'ai-assistant': '/ai',
+  settings: '/settings',
+};
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -14,18 +33,30 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, activeItem, onNavigate, rightPanel }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const router = useRouter();
 
   const handleToggle = useCallback(() => {
     setSidebarCollapsed((prev) => !prev);
   }, []);
 
+  const handleNavigate = useCallback((id: string) => {
+    if (onNavigate) {
+      onNavigate(id);
+    } else {
+      const route = NAV_ROUTES[id];
+      if (route) {
+        router.push(route);
+      }
+    }
+  }, [onNavigate, router]);
+
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden gemini-border" style={{ backgroundColor: 'var(--color-page-bg)' }}>
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={handleToggle}
         activeItem={activeItem}
-        onNavigate={onNavigate}
+        onNavigate={handleNavigate}
       />
 
       <div className="flex flex-1 flex-col overflow-hidden">
@@ -34,7 +65,7 @@ export function DashboardLayout({ children, activeItem, onNavigate, rightPanel }
         <main
           className={cn(
             'flex-1 overflow-y-auto',
-            'scrollbar-thin dark:scrollbar-thin-dark',
+            'scrollbar-thin-dark',
           )}
         >
           <div className={cn(
@@ -45,7 +76,7 @@ export function DashboardLayout({ children, activeItem, onNavigate, rightPanel }
               {children}
             </div>
             {rightPanel && (
-              <aside className="hidden xl:block w-80 shrink-0 border-l border-border/50">
+              <aside className="hidden xl:block w-80 shrink-0 border-l" style={{ borderColor: 'var(--color-border-light)' }}>
                 {rightPanel}
               </aside>
             )}
