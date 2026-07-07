@@ -202,6 +202,7 @@
   --animate-gradient: gradient 4s ease infinite;
   --animate-aurora: aurora 8s ease-in-out infinite;
   --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-pulse-border: pulse-border 2s ease-in-out infinite;
 }
 
 @keyframes fade-in {
@@ -304,6 +305,11 @@
 @keyframes glow-pulse {
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
+}
+
+@keyframes pulse-border {
+  0%, 100% { border-color: rgba(239, 68, 68, 0.6); }
+  50% { border-color: rgba(239, 68, 68, 0.3); }
 }
 
 @utility glass-panel {

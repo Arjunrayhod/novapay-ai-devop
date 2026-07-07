@@ -1,0 +1,127 @@
+INFO:     Will watch for changes in these directories: ['C:\\Users\\galaxy\\Downloads\\novapay-ai-devops-main\\novapay-ai-devops-main\\dashboard\\apps\\api']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [32252] using WatchFiles
+INFO:     Started server process [71580]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:56280 - "GET /api/docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52073 - "GET /api/v1/github/connection HTTP/1.1" 401 Unauthorized
+C:\Users\galaxy\AppData\Local\Programs\Python\Python314\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:52083 - "POST /api/auth/register HTTP/1.1" 200 OK
+C:\Users\galaxy\AppData\Local\Programs\Python\Python314\Lib\site-packages\jwt\api_jwt.py:368: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:52087 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64168 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51382 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65096 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58154 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58263 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52863 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52863 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58154 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58263 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:65096 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51382 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64168 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64168 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64276 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55010 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60618 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52862 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54662 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61983 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61983 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54662 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52862 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:55010 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:60618 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:64276 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:61363 - "GET /docs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:59214 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59216 - "GET /api/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:59220 - "POST /api/auth/register HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:59232 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+C:\Users\galaxy\AppData\Local\Programs\Python\Python314\Lib\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  return self._jws.encode(
+INFO:     127.0.0.1:59242 - "POST /api/auth/register HTTP/1.1" 200 OK
+C:\Users\galaxy\AppData\Local\Programs\Python\Python314\Lib\site-packages\jwt\api_jwt.py:368: InsecureKeyLengthWarning: The HMAC key is 23 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+  decoded = self.decode_complete(
+INFO:     127.0.0.1:59245 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64339 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63489 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49375 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:55700 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49853 - "GET /api/ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50496 - "GET /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64919 - "GET /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64919 - "GET /api/ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49580 - "GET /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49580 - "GET /api/ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49580 - "GET /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50722 - "GET /api/environment/tools HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49580 - "GET /api/environment/validation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62844 - "GET /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63543 - "GET /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63543 - "GET /api/environment/tools HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62569 - "GET /api/environment/validation HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62569 - "GET /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63543 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62569 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58160 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51309 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52686 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56847 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56847 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:52686 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51309 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58160 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:62569 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56847 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:56847 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:63441 - "OPTIONS /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63441 - "POST /api/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:57981 - "OPTIONS /api/auth/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59427 - "POST /api/auth/register HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59427 - "OPTIONS /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57981 - "OPTIONS /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59427 - "OPTIONS /api/ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57981 - "GET /api/environment/system HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59427 - "GET /api/environment/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57981 - "GET /api/ai/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "OPTIONS /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58637 - "OPTIONS /api/v1/github/repos HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54612 - "OPTIONS /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "OPTIONS /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "OPTIONS /api/v1/github/releases?per_page=5 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "OPTIONS /api/v1/github/contributors?per_page=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51760 - "OPTIONS /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54612 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58637 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51760 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54612 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58637 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51760 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54612 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54612 - "GET /api/v1/github/repos HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51760 - "GET /api/v1/github/commits?page=1&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51760 - "GET /api/v1/github/workflows/runs?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:54612 - "GET /api/v1/github/releases?per_page=5 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:50605 - "GET /api/v1/github/pulls?state=open&per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58637 - "GET /api/v1/github/contributors?per_page=10 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:58637 - "OPTIONS /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58637 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58637 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56658 - "OPTIONS /api/v1/github/connection/test HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55972 - "POST /api/v1/github/connection/test HTTP/1.1" 401 Unauthorized
+WARNING:  WatchFiles detected changes in 'src\routes\github.py'. Reloading...
+ INFO:     127.0.0.1:62125 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60206 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61438 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61438 - "GET /api/v1/github/connection HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51837 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61005 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61018 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54222 - "GET /api/health HTTP/1.1" 200 OK

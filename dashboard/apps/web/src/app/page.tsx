@@ -21,8 +21,8 @@ import {
   TopologyView,
   AIStatusCard,
   Terminal,
-  TerminalLine,
 } from '@aegisai/ui';
+import { useAuth } from '@/modules/auth/hooks/use-auth';
 import {
   Activity,
   Server,
@@ -75,6 +75,7 @@ function DashboardContent() {
   const { data: system, isLoading: sysLoading, isError: sysError, refetch: sysRefetch } = useSystemInfo();
   const { data: health, isLoading: healthLoading, isError: healthError, refetch: healthRefetch } = useHealth();
   const { data: aiHealth, isLoading: aiLoading, refetch: aiRefetch } = useAIHealth();
+  const { token } = useAuth();
   const router = useRouter();
 
   const loading = sysLoading || healthLoading;
@@ -166,6 +167,8 @@ function DashboardContent() {
     },
   ] : [];
 
+  const overallHealthStatus: 'healthy' | 'warning' | 'critical' = (health?.overall ?? 0) >= 70 ? 'healthy' : (health?.overall ?? 0) >= 40 ? 'warning' : 'critical';
+
   const areaData = system ? [
     { name: 'CPU', value: cpuPercent, value2: 100 - cpuPercent },
     { name: 'RAM', value: memPercent, value2: 100 - memPercent },
@@ -202,7 +205,7 @@ function DashboardContent() {
 
   if (error && !loading) {
     return (
-      <DashboardLayout activeItem="dashboard">
+      <DashboardLayout activeItem="dashboard" healthStatus={overallHealthStatus} healthScore={health?.overall}>
         <PageContainer>
           <PageHeader
             title="Dashboard"
@@ -232,7 +235,7 @@ function DashboardContent() {
   }
 
   return (
-    <DashboardLayout activeItem="dashboard">
+    <DashboardLayout activeItem="dashboard" healthStatus={overallHealthStatus} healthScore={health?.overall}>
       <PageContainer>
         <PageHeader
           title="Dashboard"
@@ -349,13 +352,12 @@ function DashboardContent() {
                   description="Live command output"
                   className="mb-4"
                 />
-                <Terminal title="system-info.log" maxHeight={180}>
-                  <TerminalLine>[INFO]  System: {system ? `${system.hostname} (${system.os})` : 'Loading...'}</TerminalLine>
-                  <TerminalLine>[INFO]  CPU: {system ? `${system.cpu_cores} cores @ ${system.cpu_frequency}` : 'Loading...'}</TerminalLine>
-                  <TerminalLine prefix="[OK]">  RAM: {system ? `${formatBytes(system.ram_total)} (${memPercent}% used)` : 'Loading...'}</TerminalLine>
-                  <TerminalLine>[INFO]  Disk: {system ? `${formatBytes(system.disk_total)} (${diskPercent}% used)` : 'Loading...'}</TerminalLine>
-                  <TerminalLine prefix="[OK]">  Health Score: {health ? `${health.overall}%` : 'Loading...'}</TerminalLine>
-                </Terminal>
+                <Terminal
+                  title="PowerShell 7"
+                  maxHeight={180}
+                  wsUrl={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/$/, '').replace(/^http/, 'ws')}/api/terminal/ws`}
+                  token={token || undefined}
+                />
               </section>
             </div>
           </div>

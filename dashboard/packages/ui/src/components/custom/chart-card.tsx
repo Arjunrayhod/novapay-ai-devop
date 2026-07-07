@@ -111,28 +111,30 @@ type AreaChartProps = {
 const ChartArea = memo(function ChartArea({ data, areas, height = 220 }: AreaChartProps) {
   const id = React.useId();
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-        {gradientDefs(`gradient-${id}`, areas[0]?.color ?? chartColors.primary)}
-        {areas.length > 1 && gradientDefs(`gradient-${id}-2`, areas[1]?.color ?? chartColors.accent)}
-        <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<CustomTooltip />} />
-        {areas.map((area, i) => (
-          <Area
-            key={area.key}
-            type="monotone"
-            dataKey={area.key}
-            stroke={area.color}
-            fill={`url(#gradient-${id}${i > 0 ? '-2' : ''})`}
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 5, fill: area.color, strokeWidth: 0, className: 'drop-shadow-lg' }}
-          />
-        ))}
-      </AreaChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height, position: 'relative' }}>
+      <ResponsiveContainer width="100%" height={height}>
+        <AreaChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          {gradientDefs(`gradient-${id}`, areas[0]?.color ?? chartColors.primary)}
+          {areas.length > 1 && gradientDefs(`gradient-${id}-2`, areas[1]?.color ?? chartColors.accent)}
+          <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<CustomTooltip />} />
+          {areas.map((area, i) => (
+            <Area
+              key={area.key}
+              type="monotone"
+              dataKey={area.key}
+              stroke={area.color}
+              fill={`url(#gradient-${id}${i > 0 ? '-2' : ''})`}
+              strokeWidth={2}
+              dot={false}
+              activeDot={{ r: 5, fill: area.color, strokeWidth: 0, className: 'drop-shadow-lg' }}
+            />
+          ))}
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 });
 
@@ -144,22 +146,24 @@ type LineChartProps = {
 
 const ChartLine = memo(function ChartLine({ data, color = chartColors.primary, height = 220 }: LineChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-        <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<CustomTooltip />} />
-        <Line
-          type="monotone"
-          dataKey="value"
-          stroke={color}
-          strokeWidth={2}
-          dot={{ fill: color, r: 3, strokeWidth: 0 }}
-          activeDot={{ r: 6, fill: color, strokeWidth: 0, className: 'drop-shadow-lg' }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height, position: 'relative' }}>
+      <ResponsiveContainer width="100%" height={height}>
+        <LineChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<CustomTooltip />} />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={color}
+            strokeWidth={2}
+            dot={{ fill: color, r: 3, strokeWidth: 0 }}
+            activeDot={{ r: 6, fill: color, strokeWidth: 0, className: 'drop-shadow-lg' }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 });
 
@@ -170,19 +174,21 @@ type BarChartProps = {
 
 const ChartBar = memo(function ChartBar({ data, height = 220 }: BarChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-        <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
-        <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
-        <Tooltip content={<CustomTooltip />} />
-        <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={40}>
-          {data.map((entry, i) => (
-            <Cell key={i} fill={entry.color ?? chartColors.primary} fillOpacity={0.85} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height, position: 'relative' }}>
+      <ResponsiveContainer width="100%" height={height}>
+        <BarChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <CartesianGrid stroke={chartColors.grid} strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="name" tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <YAxis tick={{ fill: chartColors.text, fontSize: 11 }} axisLine={false} tickLine={false} />
+          <Tooltip content={<CustomTooltip />} />
+          <Bar dataKey="value" radius={[6, 6, 0, 0]} maxBarSize={40}>
+            {data.map((entry, i) => (
+              <Cell key={i} fill={entry.color ?? chartColors.primary} fillOpacity={0.85} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   );
 });
 
@@ -195,7 +201,7 @@ type DonutChartProps = {
 
 const ChartDonut = memo(function ChartDonut({ data, height = 220, innerRadius = 60, outerRadius = 85 }: DonutChartProps) {
   return (
-    <div className="flex items-center justify-center gap-6">
+    <div className="flex items-center justify-center gap-6" style={{ width: '100%', height, position: 'relative' }}>
       <ResponsiveContainer width="100%" height={height}>
         <PieChart>
           <Pie
@@ -240,7 +246,7 @@ const ChartGauge = memo(function ChartGauge({ value, max = 100, label, color = c
   ];
 
   return (
-    <div className="flex flex-col items-center" style={{ height }}>
+    <div className="flex flex-col items-center" style={{ width: '100%', height }}>
       <ResponsiveContainer width="100%" height={120}>
         <PieChart>
           <Pie

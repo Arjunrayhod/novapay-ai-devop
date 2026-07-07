@@ -15,6 +15,7 @@ interface MetricCardProps extends React.HTMLAttributes<HTMLDivElement> {
   trendValue?: string;
   sparklineData?: number[];
   health?: 'success' | 'warning' | 'danger' | 'neutral';
+  critical?: boolean;
   lastUpdate?: string;
   loading?: boolean;
 }
@@ -83,6 +84,7 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
       trendValue,
       sparklineData,
       health,
+      critical,
       lastUpdate,
       loading,
       ...props
@@ -114,6 +116,8 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
             'group cursor-default relative overflow-hidden',
             'hover:border-primary-500/20 hover:shadow-glow-primary/10',
             'before:absolute before:inset-0 before:opacity-0 before:bg-gradient-to-br before:from-primary-500/[0.04] before:to-transparent before:transition-opacity before:duration-300 hover:before:opacity-100',
+            critical && 'border-danger-500/60 shadow-[0_0_20px_rgba(239,68,68,0.25)]',
+            critical && 'animate-pulse-border',
             className,
           )}
           {...props}
@@ -129,15 +133,20 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
                 <p className="text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-secondary)' }}>{title}</p>
               </div>
               {health && (
-                <span
-                  className={cn(
-                    'flex h-2 w-2 rounded-full',
-                    health === 'success' && 'bg-success-500 shadow-lg shadow-success-500/30',
-                    health === 'warning' && 'bg-warning-500 shadow-lg shadow-warning-500/30',
-                    health === 'danger' && 'bg-danger-500 shadow-lg shadow-danger-500/30',
-                    health === 'neutral' && 'bg-neutral-500',
+                <span className="relative flex h-2.5 w-2.5">
+                  {critical && (
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger-400 opacity-75" />
                   )}
-                />
+                  <span
+                    className={cn(
+                      'relative inline-flex h-2.5 w-2.5 rounded-full',
+                      health === 'success' && 'bg-success-500 shadow-lg shadow-success-500/30',
+                      health === 'warning' && 'bg-warning-500 shadow-lg shadow-warning-500/30',
+                      health === 'danger' && (critical ? 'bg-danger-400 shadow-[0_0_8px_rgba(239,68,68,0.6)]' : 'bg-danger-500 shadow-lg shadow-danger-500/30'),
+                      health === 'neutral' && 'bg-neutral-500',
+                    )}
+                  />
+                </span>
               )}
             </div>
 

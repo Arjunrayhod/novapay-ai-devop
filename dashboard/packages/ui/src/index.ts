@@ -36,6 +36,8 @@ export * from './components/custom/environment-badge';
 export * from './components/custom/hero-banner';
 export * from './components/custom/ai-status-card';
 export * from './components/custom/topology-view';
+export { IntegrationCard } from './components/custom/integration-card';
+export type { IntegrationCardIntegration } from './components/custom/integration-card';
 export { InfrastructurePlaceholder } from './components/custom/infrastructure-placeholder';
 export { SystemConsentDialog, getSystemConsent, setSystemConsent } from './components/custom/system-consent';
 

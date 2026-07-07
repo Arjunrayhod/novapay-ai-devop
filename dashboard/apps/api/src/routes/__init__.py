@@ -9,6 +9,7 @@ from . import security
 from . import system
 from . import ai
 from . import environment
+from . import terminal
 
 __all__ = [
     "auth",
@@ -22,4 +23,5 @@ __all__ = [
     "system",
     "ai",
     "environment",
+    "terminal",
 ]

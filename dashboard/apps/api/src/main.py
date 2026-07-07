@@ -23,10 +23,12 @@ from .routes import (
     system,
     ai,
     environment,
+    terminal,
 )
 from .security_center.router import router as security_module_router
 from .settings import settings
 from .terraform_center.router import router as terraform_module_router
+from .integrations.router import router as integrations_router
 
 
 @asynccontextmanager
@@ -62,6 +64,7 @@ app.include_router(security.router, prefix="/api/v1/security", tags=["security"]
 app.include_router(system.router, prefix="/api/v1/system", tags=["system"])
 app.include_router(ai.router, prefix="/api/v1/ai", tags=["ai"])
 app.include_router(environment.router, prefix="/api/v1/environment", tags=["environment"])
+app.include_router(terminal.router, prefix="/api/terminal", tags=["terminal"])
 app.include_router(
     environment_module_router, prefix="/api/environment", tags=["environment-module"]
 )
@@ -77,6 +80,7 @@ app.include_router(ai_module_router, prefix="/api/ai", tags=["ai-module"])
 app.include_router(
     dev_experience_module_router, prefix="/api/dev-experience", tags=["dev-experience-module"]
 )
+app.include_router(integrations_router, prefix="/api", tags=["integrations"])
 
 
 @app.get("/api/health")

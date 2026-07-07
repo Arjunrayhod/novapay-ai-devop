@@ -10,6 +10,8 @@ import { NotificationPanel, type Notification } from './notification';
 interface NavbarProps {
   onSearchOpen?: () => void;
   onNotificationsOpen?: () => void;
+  healthStatus?: 'healthy' | 'warning' | 'critical';
+  healthScore?: number;
 }
 
 const SAMPLE_NOTIFICATIONS: Notification[] = [
@@ -19,7 +21,7 @@ const SAMPLE_NOTIFICATIONS: Notification[] = [
   { id: '4', type: 'error', title: 'Pod crash loop', message: 'payment-worker-2j9dk restarted 3x', timestamp: new Date(Date.now() - 120 * 60000) },
 ];
 
-export function Navbar({ onSearchOpen, onNotificationsOpen }: NavbarProps) {
+export function Navbar({ onSearchOpen, onNotificationsOpen, healthStatus = 'healthy', healthScore }: NavbarProps) {
   const { theme, toggle, mounted } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -153,10 +155,26 @@ export function Navbar({ onSearchOpen, onNotificationsOpen }: NavbarProps) {
 
         <div className="flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs" style={{ borderColor: 'var(--color-border-light)', backgroundColor: 'var(--color-hover-bg)' }}>
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-success-500" />
+            {healthStatus === 'critical' && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-danger-400 opacity-75" />
+            )}
+            {healthStatus === 'warning' && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-warning-400 opacity-75" />
+            )}
+            {healthStatus === 'healthy' && (
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-400 opacity-75" />
+            )}
+            <span className={cn(
+              'relative inline-flex h-2 w-2 rounded-full',
+              healthStatus === 'critical' && 'bg-danger-500',
+              healthStatus === 'warning' && 'bg-warning-500',
+              healthStatus === 'healthy' && 'bg-success-500',
+            )} />
           </span>
-          <span style={{ color: 'var(--color-text-secondary)' }}>Healthy</span>
+          <span style={{ color: 'var(--color-text-secondary)' }}>
+            {healthStatus === 'critical' ? 'Critical' : healthStatus === 'warning' ? 'Warning' : 'Healthy'}
+            {healthScore !== undefined && ` (${healthScore}%)`}
+          </span>
         </div>
       </div>
 

@@ -15,10 +15,13 @@ const models = [
 ];
 
 const recommendations = [
-  { text: 'Scale cluster eu-1 from 4 to 6 nodes', impact: 'high', reason: 'CPU threshold at 82%' },
-  { text: 'Review cache hit ratio in prod-api', impact: 'medium', reason: 'Ratio dropped to 68%' },
-  { text: 'Update Vault policy for access rotation', impact: 'low', reason: '90 days since last rotation' },
-];
+  { text: 'Scale cluster eu-1 from 4 to 6 nodes', impact: 'high' as const, reason: 'CPU threshold at 82%' },
+  { text: 'Review cache hit ratio in prod-api', impact: 'medium' as const, reason: 'Ratio dropped to 68%' },
+  { text: 'Update Vault policy for access rotation', impact: 'low' as const, reason: '90 days since last rotation' },
+].sort((a, b) => {
+  const order = { high: 0, medium: 1, low: 2 };
+  return order[a.impact] - order[b.impact];
+});
 
 const recentActivity = [
   { time: '2m ago', event: 'Deployment prod-api v3.2.1 rolled out', type: 'success' as const },
@@ -129,7 +132,13 @@ export function AIStatusCard({ className }: AIStatusCardProps) {
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.1 }}
-              className="flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-xs transition-colors cursor-pointer border border-transparent hover:bg-[var(--color-hover-bg)] hover:border-[var(--color-border-light)]"
+              className={cn(
+                'flex items-start gap-2.5 rounded-lg px-3 py-2.5 text-xs transition-colors cursor-pointer border',
+                rec.impact === 'high' && 'bg-danger-500/5 border-danger-500/15 hover:bg-danger-500/10',
+                rec.impact === 'medium' && 'bg-warning-500/5 border-warning-500/15 hover:bg-warning-500/10',
+                rec.impact === 'low' && 'bg-primary-500/5 border-primary-500/15 hover:bg-primary-500/10',
+                !rec.impact && 'border-transparent hover:bg-[var(--color-hover-bg)] hover:border-[var(--color-border-light)]',
+              )}
             >
               <Activity className={cn(
                 'h-3.5 w-3.5 mt-0.5 shrink-0',

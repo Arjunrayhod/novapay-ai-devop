@@ -23,5 +23,6 @@ async def init_db():
     async with engine.begin() as conn:
         from .models.user import User  # noqa: F401
         from .models.github_credential import GitHubCredential  # noqa: F401
+        from .integrations.models import IntegrationCredential  # noqa: F401
 
         await conn.run_sync(Base.metadata.create_all)

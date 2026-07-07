@@ -15,6 +15,7 @@ const NAV_ROUTES: Record<string, string> = {
   helm: '/helm',
   terraform: '/terraform',
   github: '/github',
+  integrations: '/integrations',
   security: '/security',
   monitoring: '/observability',
   logs: '/observability',
@@ -29,9 +30,11 @@ interface DashboardLayoutProps {
   activeItem?: string;
   onNavigate?: (id: string) => void;
   rightPanel?: React.ReactNode;
+  healthStatus?: 'healthy' | 'warning' | 'critical';
+  healthScore?: number;
 }
 
-export function DashboardLayout({ children, activeItem, onNavigate, rightPanel }: DashboardLayoutProps) {
+export function DashboardLayout({ children, activeItem, onNavigate, rightPanel, healthStatus, healthScore }: DashboardLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const router = useRouter();
 
@@ -60,7 +63,7 @@ export function DashboardLayout({ children, activeItem, onNavigate, rightPanel }
       />
 
       <div className="flex flex-1 flex-col overflow-hidden">
-        <Navbar />
+        <Navbar healthStatus={healthStatus} healthScore={healthScore} />
 
         <main
           className={cn(
