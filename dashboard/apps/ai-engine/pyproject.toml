@@ -1,0 +1,9 @@
+[project]
+name = "aegisai-ai-engine"
+version = "0.1.0"
+description = "AegisAI AI Engine - Reserved for future AI/ML capabilities"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = []

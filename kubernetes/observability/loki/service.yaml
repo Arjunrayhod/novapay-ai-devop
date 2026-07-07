@@ -16,9 +16,5 @@ spec:
       port: 9095
       targetPort: 9095
       protocol: TCP
-    - name: http-metrics
-      port: 3100
-      targetPort: 3100
-      protocol: TCP
   selector:
     app.kubernetes.io/name: loki

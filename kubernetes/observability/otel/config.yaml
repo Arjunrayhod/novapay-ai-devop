@@ -34,7 +34,7 @@ data:
 
     exporters:
       prometheus:
-        endpoint: 0.0.0.0:8888
+        endpoint: 0.0.0.0:8889
         namespace: otel
       otlp:
         endpoint: tempo:4317

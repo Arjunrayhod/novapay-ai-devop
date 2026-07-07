@@ -1,0 +1,35 @@
+{
+  "name": "@aegisai/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start",
+    "lint": "echo 'lint placeholder'",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf .next node_modules"
+  },
+  "dependencies": {
+    "@aegisai/hooks": "workspace:*",
+    "@aegisai/theme": "workspace:*",
+    "@aegisai/types": "workspace:*",
+    "@aegisai/ui": "workspace:*",
+    "@aegisai/utils": "workspace:*",
+    "@tanstack/react-query": "^5.101.2",
+    "lucide-react": "^0.460.0",
+    "next": "^15.1.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@aegisai/config": "workspace:*",
+    "@eslint/eslintrc": "^3.0.0",
+    "@tailwindcss/postcss": "^4.3.2",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "postcss-import": "^16.1.1",
+    "typescript": "^5.6.0"
+  }
+}
